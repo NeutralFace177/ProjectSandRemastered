@@ -55,6 +55,11 @@ const METHANE_PARTICLE = 7;
 const TREE_PARTICLE = 8;
 const CHARGED_NITRO_PARTICLE = 9;
 const NUKE_PARTICLE = 10;
+const FIREWORK_PARTICLE = 11;
+const SNAP_PARTICLE = 12;
+const CURSEWORK_PARTICLE = 13;
+const CHARGED_CURSE_PARTICLE = 14;
+const HUMAN_PARTICLE = 15;
 
 const __particleInit = [
   UNKNOWN_PARTICLE_INIT,
@@ -68,6 +73,11 @@ const __particleInit = [
   TREE_PARTICLE_INIT,
   CHARGED_NITRO_PARTICLE_INIT,
   NUKE_PARTICLE_INIT,
+  FIREWORK_PARTICLE_INIT,
+  SNAP_PARTICLE_INIT,
+  CURSEWORK_PARTICLE_INIT,
+  CHARGED_CURSE_PARTICLE_INIT,
+  HUMAN_PARTICLE_INIT
 ];
 Object.freeze(__particleInit);
 
@@ -83,6 +93,11 @@ const __particleActions = [
   TREE_PARTICLE_ACTION,
   CHARGED_NITRO_PARTICLE_ACTION,
   NUKE_PARTICLE_ACTION,
+  FIREWORK_PARTICLE_ACTION,
+  SNAP_PARTICLE_ACTION,
+  CURSEWORK_PARTICLE_ACTION,
+  CHARGED_CURSE_PARTICLE_ACTION,
+  HUMAN_PARTICLE_ACTION
 ];
 Object.freeze(__particleActions);
 
@@ -221,6 +236,145 @@ function LAVA_PARTICLE_ACTION(particle) {
       if (random() < 70) replaceColor = ROCK;
     } else if (touchingColor === WALL) {
       if (random() < 25) replaceColor = LAVA;
+    }
+
+    if (replaceColor !== -1) {
+      particle.setColor(replaceColor);
+      particle.drawCircle(particle.size / 2);
+      particles.makeParticleInactive(particle);
+      return;
+    }
+  }
+}
+
+function FIREWORK_PARTICLE_INIT(particle) {
+  if (random() < 34) particle.setColor(FIRE);
+  if (random() < 33) particle.setColor(FIRE_BLUE);
+  if (random() < 33) particle.setColor(FIRE_BRIGHT);
+ 
+  /* Make it harder for the angle to be steep */
+  var angle = QUARTER_PI + Math.random() * HALF_PI;
+  if (random() < 55 && Math.abs(HALF_PI - angle) < EIGHTEENTH_PI)
+    angle += EIGHTEENTH_PI * (angle > HALF_PI ? 1 : -1);
+
+  particle.xVelocity = (1 + Math.random() * 3) * Math.cos(angle);
+  particle.yVelocity = (-4 * Math.random() - 3) * Math.sin(angle);
+  particle.initYVelocity = particle.yVelocity;
+  particle.yAcceleration = 0.06;
+
+  particle.size = 4 + Math.random() * 3;
+  particle.y -= particle.size;
+}
+
+function FIREWORK_PARTICLE_ACTION(particle) {
+  offscreenParticleCtx.beginPath();
+  offscreenParticleCtx.lineWidth = particle.size;
+  offscreenParticleCtx.strokeStyle = particle.rgbaColor;
+  offscreenParticleCtx.lineCap = "round";
+  offscreenParticleCtx.moveTo(particle.x, particle.y);
+
+  const iterations = particle.actionIterations;
+  particle.x += particle.xVelocity;
+  particle.y =
+    particle.initY +
+    particle.initYVelocity * iterations +
+    (particle.yAcceleration * iterations * iterations) / 2;
+
+  offscreenParticleCtx.lineTo(particle.x, particle.y);
+  offscreenParticleCtx.stroke();
+
+  /* Allow particle to exist "above" the canvas */
+  if (particle.x < 0 || particle.x > MAX_X_IDX || particle.y > MAX_Y_IDX) {
+    particles.makeParticleInactive(particle);
+    return;
+  }
+
+  /* possible extinguish due to water, lava, rock, ice, or wall */
+  if (random() < 25) {
+    /* Need to update yVelocity before calling aboutToHit() */
+    particle.yVelocity =
+      particle.initYVelocity + particle.yAcceleration * iterations;
+    const touchingColor = particle.aboutToHit();
+
+    var replaceColor = -1;
+    if (touchingColor === WATER || touchingColor === SALT_WATER) {
+      if (random() < 58) replaceColor = STEAM;
+    } else if (touchingColor === LAVA) {
+      if (random() < 75) replaceColor = NAPALM;
+    } else if (
+      touchingColor === ICE ||
+      touchingColor === CHILLED_ICE ||
+      touchingColor === CRYO
+    ) {
+      if (random() < 70) replaceColor = STEAM;
+    }
+
+    if (replaceColor !== -1) {
+      particle.setColor(replaceColor);
+      particle.drawCircle(particle.size / 2);
+      particles.makeParticleInactive(particle);
+      return;
+    }
+  }
+}
+
+function CURSEWORK_PARTICLE_INIT(particle) {
+  particle.setColor(FIRE_CURSE);
+  /* Make it harder for the angle to be steep */
+  var angle = QUARTER_PI + Math.random() * HALF_PI;
+  if (random() < 55 && Math.abs(HALF_PI - angle) < EIGHTEENTH_PI)
+    angle += EIGHTEENTH_PI * (angle > HALF_PI ? 1 : -1);
+
+  particle.xVelocity = (1 + Math.random() * 3) * Math.cos(angle);
+  particle.yVelocity = (-4 * Math.random() - 3) * Math.sin(angle);
+  particle.initYVelocity = particle.yVelocity;
+  particle.yAcceleration = 0.06;
+
+  particle.size = 4 + Math.random() * 3;
+  particle.y -= particle.size;
+}
+
+function CURSEWORK_PARTICLE_ACTION(particle) {
+  offscreenParticleCtx.beginPath();
+  offscreenParticleCtx.lineWidth = particle.size;
+  offscreenParticleCtx.strokeStyle = particle.rgbaColor;
+  offscreenParticleCtx.lineCap = "round";
+  offscreenParticleCtx.moveTo(particle.x, particle.y);
+
+  const iterations = particle.actionIterations;
+  particle.x += particle.xVelocity;
+  particle.y =
+    particle.initY +
+    particle.initYVelocity * iterations +
+    (particle.yAcceleration * iterations * iterations) / 2;
+
+  offscreenParticleCtx.lineTo(particle.x, particle.y);
+  offscreenParticleCtx.stroke();
+
+  /* Allow particle to exist "above" the canvas */
+  if (particle.x < 0 || particle.x > MAX_X_IDX || particle.y > MAX_Y_IDX) {
+    particles.makeParticleInactive(particle);
+    return;
+  }
+
+  /* possible extinguish due to water, lava, rock, ice, or wall */
+  if (random() < 25) {
+    /* Need to update yVelocity before calling aboutToHit() */
+    particle.yVelocity =
+      particle.initYVelocity + particle.yAcceleration * iterations;
+    const touchingColor = particle.aboutToHit();
+
+    var replaceColor = -1;
+    if (touchingColor === WATER || touchingColor === SALT_WATER) {
+      if (random() < 58) replaceColor = STEAM;
+    } else if (touchingColor === LAVA) {
+      if (random() < 75) replaceColor = NAPALM;
+    } else if (
+      touchingColor === ICE ||
+      touchingColor === CHILLED_ICE ||
+      touchingColor === CRYO
+    ) {
+      if (random() < 70) replaceColor = STEAM;
     }
 
     if (replaceColor !== -1) {
@@ -551,6 +705,44 @@ function CHARGED_NITRO_PARTICLE_ACTION(particle) {
   }
 }
 
+function CHARGED_CURSE_PARTICLE_INIT(particle) {
+  particle.setColor(FIRE_CURSE);
+  particle.size = 4;
+  particle.xVelocity = 0;
+  particle.yVelocity = -100;
+
+  /* Search upwards for a WALL collision (but don't check every pixel) */
+  particle.minY = -1;
+  const step = (3 + Math.round(Math.random() * 2)) * width;
+  for (var idx = particle.i; idx > -1; idx -= step) {
+    if (gameImagedata32[idx] === WALL) {
+      particle.minY = idx / width;
+      break;
+    }
+    if (gameImagedata32[idx] === BEDROCK) {
+      particle.minY = idx / width;
+      break;
+    }
+  }
+}
+
+function CHARGED_CURSE_PARTICLE_ACTION(particle) {
+  offscreenParticleCtx.beginPath();
+  offscreenParticleCtx.lineWidth = particle.size;
+  offscreenParticleCtx.strokeStyle = particle.rgbaColor;
+  offscreenParticleCtx.lineCap = "square";
+  offscreenParticleCtx.moveTo(particle.initX, particle.initY);
+  particle.x += particle.xVelocity;
+  particle.y = Math.max(particle.minY, particle.y + particle.yVelocity);
+  offscreenParticleCtx.lineTo(particle.x, particle.y);
+  offscreenParticleCtx.stroke();
+
+  if (particle.y <= particle.minY || particle.offCanvas()) {
+    particles.makeParticleInactive(particle);
+    return;
+  }
+}
+
 function NUKE_PARTICLE_INIT(particle) {
   particle.setColor(FIRE);
   const maxDimension = Math.max(width, height);
@@ -561,6 +753,83 @@ function NUKE_PARTICLE_ACTION(particle) {
   particle.drawCircle(particle.size);
 
   if (particle.actionIterations > 4) particles.makeParticleInactive(particle);
+}
+
+function SNAP_PARTICLE_INIT(particle) {
+  if (random() < 50) particle.setColor(DUST);
+  const maxDimension = Math.max(width, height);
+  particle.size = maxDimension / 8 + (Math.random() * maxDimension) / 16;
+}
+
+function SNAP_PARTICLE_ACTION(particle) {
+  particle.drawCircle(particle.size);
+
+  if (particle.actionIterations > 4) particles.makeParticleInactive(particle);
+}
+
+function HUMAN_PARTICLE_INIT(particle) {
+  particle.setColor(HUMAN_MAKER);
+  /* Make it harder for the angle to be steep */
+  var angle = QUARTER_PI + Math.random() * HALF_PI;
+  if (random() < 90 && Math.abs(HALF_PI - angle) < EIGHTEENTH_PI)
+    angle += EIGHTEENTH_PI * (angle > HALF_PI ? 1 : -1);
+
+  particle.xVelocity = (1 + Math.random() * 1) * Math.cos(angle);
+  particle.yVelocity = (-2 * Math.random() - 1) * Math.sin(angle);
+  particle.initYVelocity = particle.yVelocity;
+  particle.yAcceleration = 0.03;
+
+  particle.size = 1 + Math.random() * 2;
+  particle.y -= particle.size;
+}
+
+function HUMAN_PARTICLE_ACTION(particle) {
+  offscreenParticleCtx.beginPath();
+  offscreenParticleCtx.lineWidth = particle.size;
+  offscreenParticleCtx.strokeStyle = particle.rgbaColor;
+  offscreenParticleCtx.lineCap = "round";
+  offscreenParticleCtx.moveTo(particle.x, particle.y);
+
+  const iterations = particle.actionIterations;
+  particle.x += particle.xVelocity;
+  particle.y =
+    particle.initY +
+    particle.initYVelocity * iterations +
+    (particle.yAcceleration * iterations * iterations) / 2;
+
+  offscreenParticleCtx.lineTo(particle.x, particle.y);
+  offscreenParticleCtx.stroke();
+
+  /* Allow particle to exist "above" the canvas */
+  if (particle.x < 0 || particle.x > MAX_X_IDX || particle.y > MAX_Y_IDX) {
+    particles.makeParticleInactive(particle);
+    return;
+  }
+
+  /* possible extinguish due to water, lava, rock, ice, or wall */
+  if (random() < 100) {
+    /* Need to update yVelocity before calling aboutToHit() */
+    particle.yVelocity =
+      particle.initYVelocity + particle.yAcceleration * iterations;
+    const touchingColor = particle.aboutToHit();
+
+    var replaceColor = -1;
+    if (random() < 5) {
+      replaceColor = HUMAN;
+    }
+    if (touchingColor === LAVA || touchingColor === FIRE) {
+      if (random() < 95) replaceColor = STEAM;
+    } else if (touchingColor === WALL || touchingColor === BEDROCK || touchingColor === PLANT || touchingColor === LEAF) {
+      if (random() < 95) replaceColor = HUMAN;
+    }
+
+    if (replaceColor !== -1) {
+      particle.setColor(replaceColor);
+      particle.drawCircle(particle.size);
+      particles.makeParticleInactive(particle);
+      return;
+    }
+  }
 }
 
 class Particle {
@@ -800,6 +1069,9 @@ function initParticles() {
   offscreenParticleCanvas.height = height;
 
   PAINTABLE_PARTICLE_COLORS[FIRE] = null;
+  PAINTABLE_PARTICLE_COLORS[FIRE_CURSE] = null;
+  PAINTABLE_PARTICLE_COLORS[FIRE_BRIGHT] = null;
+  PAINTABLE_PARTICLE_COLORS[FIRE_BLUE] = null;
   PAINTABLE_PARTICLE_COLORS[WALL] = null;
   PAINTABLE_PARTICLE_COLORS[ROCK] = null;
   PAINTABLE_PARTICLE_COLORS[LAVA] = null;
@@ -810,6 +1082,9 @@ function initParticles() {
   PAINTABLE_PARTICLE_COLORS[ICE] = null;
   PAINTABLE_PARTICLE_COLORS[BRANCH] = null;
   PAINTABLE_PARTICLE_COLORS[LEAF] = null;
+  PAINTABLE_PARTICLE_COLORS[DUST] = null;
+  PAINTABLE_PARTICLE_COLORS[HUMAN_MAKER] = null;
+  PAINTABLE_PARTICLE_COLORS[HUMAN] = null;
   Object.freeze(PAINTABLE_PARTICLE_COLORS);
 
   /* All of these are also in PAINTABLE_PARTICLE_COLORS */

@@ -18,50 +18,68 @@
  */
 
 /* Configuration of the menu */
-const ELEMENT_MENU_ELEMENTS_PER_ROW = 4;
-const PEN_SIZES = [2, 4, 8, 16, 32, 64];
-const PEN_SIZE_LABELS = ["1px", "2px", "4px", "8px", "16px", "32px"];
-const DEFAULT_PEN_IDX = 1;
+const ELEMENT_MENU_ELEMENTS_PER_ROW = 10;
+const PEN_SIZES = [1, 2, 4, 8, 16, 32, 64, 128, 256];
+const PEN_SIZE_LABELS = ["0.5px", "1px", "2px", "4px", "8px", "16px", "32px", "64px", "128px"];
+const DEFAULT_PEN_IDX = 2;
 
 /* Elements listed in the menu */
 // prettier-ignore
 const elementMenuItems = [
-  WALL, SAND, WATER, PLANT,
-  FIRE, SPOUT, WELL, SALT,
-  OIL, WAX, TORCH, ICE,
-  GUNPOWDER, NAPALM, NITRO, C4,
-  LAVA, CRYO, FUSE, MYSTERY,
-  CONCRETE, METHANE, SOIL, ACID,
-  THERMITE, BACKGROUND,
+  WALL, SAND, WATER, PLANT, FIRE, SPOUT, WELL, SALT, OIL, WAX, 
+  TORCH, ICE, GUNPOWDER, NAPALM, NITRO, C4, LAVA, CRYO, FUSE, MYSTERY,
+  CONCRETE, METHANE, SOIL, ACID, THERMITE, BACKGROUND, CHARGED_NITRO, BRANCH, LEAF, POLLEN, 
+  SALT_WATER, STEAM, FALLING_WAX, ROCK, WET_SOIL, CHILLED_ICE, CORRUPT, FIREWORK, BEDROCK, SNOW, FIRE_CURSE, HUMAN, 
+  NANITES, SPICE, CLONE
 ];
 
 const menuNames = {};
 menuNames[WALL] = "WALL";
+menuNames[BEDROCK] = "BEDROCK";
 menuNames[SAND] = "SAND";
+menuNames[SNOW] = "SNOW";
 menuNames[WATER] = "WATER";
+menuNames[SALT_WATER] = "SALT WATER";
+menuNames[STEAM] = "STEAM";
 menuNames[PLANT] = "PLANT";
+menuNames[BRANCH] = "BRANCH";
+menuNames[LEAF] = "LEAF";
+menuNames[POLLEN] = "POLLEN";
 menuNames[FIRE] = "FIRE";
+menuNames[FIRE_CURSE] = "CURSED FIRE";
 menuNames[SALT] = "SALT";
 menuNames[OIL] = "OIL";
 menuNames[SPOUT] = "SPOUT";
 menuNames[WELL] = "WELL";
 menuNames[TORCH] = "TORCH";
 menuNames[GUNPOWDER] = "GUNPOWDER";
+menuNames[FIREWORK] = "FIREWORK";
 menuNames[WAX] = "WAX";
+menuNames[FALLING_WAX] = "FALLING WAX";
 menuNames[NITRO] = "NITRO";
+menuNames[CHARGED_NITRO] = "CHARGED NITRO";
 menuNames[NAPALM] = "NAPALM";
 menuNames[C4] = "C-4";
 menuNames[CONCRETE] = "CONCRETE";
 menuNames[BACKGROUND] = "ERASER";
 menuNames[FUSE] = "FUSE";
 menuNames[ICE] = "ICE";
+menuNames[CHILLED_ICE] = "CRYO ICE";
 menuNames[LAVA] = "LAVA";
+menuNames[ROCK] = "ROCK";
 menuNames[METHANE] = "METHANE";
 menuNames[CRYO] = "CRYO";
+menuNames[CORRUPT] = "CORRUPT";
 menuNames[MYSTERY] = "???";
-menuNames[SOIL] = "SOIL";
 menuNames[ACID] = "ACID";
 menuNames[THERMITE] = "THERMITE";
+menuNames[SOIL] = "SOIL";
+menuNames[WET_SOIL] = "WET SOIL";
+menuNames[HUMAN] = "HUMANS";
+menuNames[THANOS] = "THANOS";
+menuNames[NANITES] = "NANITES";
+menuNames[SPICE] = "SPICE OF LIFE";
+menuNames[CLONE] = "REPRODUCTION";
 
 /*
  * Some element colors do not have very good contrast against
@@ -245,6 +263,50 @@ function initMenu() {
   /* load button */
   const loadButton = document.getElementById("loadButton");
   loadButton.onclick = loadGameCanvas;
+
+   /*Menu keybinds*/
+  document.addEventListener('keydown', function(m) {
+    /*s - Defaut FPS*/
+    if (m.which === 83) {
+      speedSlider.value = DEFAULT_FPS;
+      setFPS(parseInt(speedSlider.value, 10));
+    }
+    /*d - Max FPS*/
+    else if (m.which === 68) {
+      speedSlider.value = MAX_FPS;
+      setFPS(parseInt(speedSlider.value, 10));
+    }
+    /*a - Min/0 FPS*/
+    else if (m.which === 65) {
+      speedSlider.value = 0;
+      setFPS(parseInt(speedSlider.value, 10));
+    }
+
+    /*c - Clear Canvas*/
+    if (m.which === 67) {
+      clearGameCanvas();
+    }
+    /*z - Save Canvas*/
+    else if (m.which === 90) {
+      saveGameCanvas();
+    }
+    /*x - Load Canvas*/
+    else if (m.which === 88) {
+      loadGameCanvas();
+    }
+
+    /*Space Bar - Overwrite Checkbox*/
+    if (m.which === 32) {
+      
+      if (overwriteCheckbox.checked !== false) {
+        overwriteCheckbox.checked = false;
+        OVERWRITE_ENABLED = false;
+      } else {
+        overwriteCheckbox.checked = true;
+        OVERWRITE_ENABLED = true;
+      } 
+    }
+  });
 }
 
 function drawFPSLabel(fps) {

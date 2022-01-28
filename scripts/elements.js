@@ -80,12 +80,17 @@ function __inGameColor(r, g, b) {
 }
 
 /* Order here MUST match order in elements and elementActions arrays */
-const BACKGROUND = __inGameColor(0, 0, 0);
+const BACKGROUND = __inGameColor(10, 10, 10);
 const WALL = __inGameColor(127, 127, 127);
+const BEDROCK = __inGameColor(99, 99, 99);
 const SAND = __inGameColor(223, 193, 99);
+const SNOW = __inGameColor(245, 245, 245);
 const WATER = __inGameColor(0, 10, 255);
 const PLANT = __inGameColor(0, 220, 0);
 const FIRE = __inGameColor(255, 0, 10);
+const FIRE_CURSE = __inGameColor(36, 240, 50);
+const FIRE_BRIGHT = __inGameColor(230, 230, 230);
+const FIRE_BLUE = __inGameColor(5, 15, 255);
 const SALT = __inGameColor(253, 253, 253);
 const SALT_WATER = __inGameColor(127, 175, 255);
 const OIL = __inGameColor(150, 60, 0);
@@ -93,6 +98,7 @@ const SPOUT = __inGameColor(117, 189, 252);
 const WELL = __inGameColor(131, 11, 28);
 const TORCH = __inGameColor(200, 5, 0);
 const GUNPOWDER = __inGameColor(170, 170, 140);
+const FIREWORK = __inGameColor(129, 169, 184);
 const WAX = __inGameColor(239, 225, 211);
 const FALLING_WAX = __inGameColor(240, 225, 211);
 const NITRO = __inGameColor(0, 150, 26);
@@ -106,6 +112,7 @@ const LAVA = __inGameColor(245, 110, 40);
 const ROCK = __inGameColor(68, 40, 8);
 const STEAM = __inGameColor(195, 214, 235);
 const CRYO = __inGameColor(0, 213, 255);
+const CORRUPT = __inGameColor(117, 56, 161);
 const MYSTERY = __inGameColor(162, 232, 196);
 const METHANE = __inGameColor(140, 140, 140);
 const SOIL = __inGameColor(120, 75, 33);
@@ -114,6 +121,13 @@ const BRANCH = __inGameColor(166, 128, 100);
 const LEAF = __inGameColor(82, 107, 45);
 const POLLEN = __inGameColor(230, 235, 110);
 const CHARGED_NITRO = __inGameColor(245, 98, 78);
+const HUMAN = __inGameColor(237, 197, 128);
+const THANOS = __inGameColor(184, 54, 217);
+const DUST = __inGameColor(199, 199, 199);
+const NANITES = __inGameColor(65, 138, 186);
+const SPICE = __inGameColor(255, 64, 0);
+const HUMAN_MAKER = __inGameColor(173, 145, 95);
+const CLONE = __inGameColor(252, 154, 216);
 const ACID = __inGameColor(157, 240, 40);
 const THERMITE = __inGameColor(195, 140, 70);
 const BURNING_THERMITE = __inGameColor(255, 130, 130);
@@ -129,10 +143,15 @@ const BURNING_THERMITE = __inGameColor(255, 130, 130);
 const elements = new Uint32Array([
   BACKGROUND,
   WALL,
+  BEDROCK,
   SAND,
+  SNOW,
   WATER,
   PLANT,
   FIRE,
+  FIRE_CURSE,
+  FIRE_BRIGHT,
+  FIRE_BLUE,
   SALT,
   SALT_WATER,
   OIL,
@@ -140,6 +159,7 @@ const elements = new Uint32Array([
   WELL,
   TORCH,
   GUNPOWDER,
+  FIREWORK,
   WAX,
   FALLING_WAX,
   NITRO,
@@ -153,6 +173,7 @@ const elements = new Uint32Array([
   ROCK,
   STEAM,
   CRYO,
+  CORRUPT,
   MYSTERY,
   METHANE,
   SOIL,
@@ -161,17 +182,29 @@ const elements = new Uint32Array([
   LEAF,
   POLLEN,
   CHARGED_NITRO,
+  HUMAN,
+  THANOS,
+  DUST,
+  NANITES,
+  SPICE,
+  HUMAN_MAKER,
+  CLONE,
   ACID,
   THERMITE,
-  BURNING_THERMITE,
+  BURNING_THERMITE
 ]);
 const elementActions = [
   BACKGROUND_ACTION,
   WALL_ACTION,
+  BEDROCK_ACTION,
   SAND_ACTION,
+  SNOW_ACTION,
   WATER_ACTION,
   PLANT_ACTION,
   FIRE_ACTION,
+  FIRE_CURSE_ACTION,
+  FIRE_BRIGHT_ACTION,
+  FIRE_BLUE_ACTION,
   SALT_ACTION,
   SALT_WATER_ACTION,
   OIL_ACTION,
@@ -179,6 +212,7 @@ const elementActions = [
   WELL_ACTION,
   TORCH_ACTION,
   GUNPOWDER_ACTION,
+  FIREWORK_ACTION,
   WAX_ACTION,
   FALLING_WAX_ACTION,
   NITRO_ACTION,
@@ -192,6 +226,7 @@ const elementActions = [
   ROCK_ACTION,
   STEAM_ACTION,
   CRYO_ACTION,
+  CORRUPT_ACTION,
   MYSTERY_ACTION,
   METHANE_ACTION,
   SOIL_ACTION,
@@ -200,6 +235,13 @@ const elementActions = [
   LEAF_ACTION,
   POLLEN_ACTION,
   CHARGED_NITRO_ACTION,
+  HUMAN_ACTION,
+  THANOS_ACTION,
+  DUST_ACTION,
+  NANITES_ACTION,
+  SPICE_ACTION,
+  HUMAN_MAKER_ACTION,
+  CLONE_ACTION,
   ACID_ACTION,
   THERMITE_ACTION,
   BURNING_THERMITE_ACTION,
@@ -241,6 +283,7 @@ function initElements() {
    * through).
    */
   GAS_PERMEABLE[SAND] = null;
+  GAS_PERMEABLE[SNOW] = null;
   GAS_PERMEABLE[WATER] = null;
   GAS_PERMEABLE[SALT] = null;
   GAS_PERMEABLE[SALT_WATER] = null;
@@ -257,17 +300,20 @@ function initElements() {
   GAS_PERMEABLE[WET_SOIL] = null;
   GAS_PERMEABLE[POLLEN] = null;
   GAS_PERMEABLE[CHARGED_NITRO] = null;
+  GAS_PERMEABLE[HUMAN] = null;
+  GAS_PERMEABLE[THANOS] = null;
   GAS_PERMEABLE[ACID] = null;
   Object.freeze(GAS_PERMEABLE);
 }
 
 /* ======================= Element action handlers ======================= */
 
-function WALL_ACTION(x, y, i) {}
+function WALL_ACTION(x, y, i) { }
+
+function BEDROCK_ACTION(x, y, i) { }
 
 function BACKGROUND_ACTION(x, y, i) {
-  throw "As an optimization, we should never be invoking the action for the " +
-        "background";
+  throw "As an optimization, we should never be invoking the action for the background";
 }
 
 function SAND_ACTION(x, y, i) {
@@ -276,22 +322,98 @@ function SAND_ACTION(x, y, i) {
     if (doDensitySink(x, y, i, WATER, true, 25)) return;
     if (doDensitySink(x, y, i, SALT_WATER, true, 25)) return;
   }
+  if (random() < 5) {
+    if (bordering(x, y, i, CORRUPT) !== -1) {
+      __doCorruption(x, y, i);
+      return;
+    }
+  }
 
   if (doGravity(x, y, i, true, 95)) return;
+}
+
+function SNOW_ACTION(x, y, i) {
+
+  if (random() < 1) {
+    if (bordering(x, y, i, WATER) !== -1) {
+      gameImagedata32[i] = WATER;
+      return;
+    }
+  }
+
+  if (random() < 5) {
+    if (bordering(x, y, i, CORRUPT) !== -1) {
+      __doCorruption(x, y, i);
+      return;
+    }
+  }
+
+  /* Really fast melt from STEAM */
+  if (random() < 70) {
+    const steamLoc = bordering(x, y, i, STEAM);
+    if (steamLoc !== -1) {
+      gameImagedata32[i] = WATER;
+      if (random() < 50) gameImagedata32[steamLoc] = WATER;
+      return;
+    }
+  }
+
+  /* Fast melt from SALT and SALT_WATER */
+  if (random() < 10) {
+    var saltLoc = bordering(x, y, i, SALT);
+    if (saltLoc === -1) saltLoc = bordering(x, y, i, SALT_WATER);
+
+    if (saltLoc !== -1) {
+      gameImagedata32[i] = WATER;
+      return;
+    }
+  }
+
+  /* Fast melt from FIREs */
+  if (random() < 50) {
+    if ((bordering(x, y, i, FIRE) !== -1) || (bordering(x, y, i, FIRE_CURSE) !== -1)) {
+      gameImagedata32[i] = WATER;
+      return;
+    }
+  }
+
+  /* Fast melt from LAVA */
+  if (random() < 50) {
+    if (bordering(x, y, i, LAVA) !== -1) {
+      gameImagedata32[i] = WATER;
+      return;
+    }
+  }
+  if (doGravity(x, y, i, true, 50)) return;
 }
 
 function WATER_ACTION(x, y, i) {
   if (doGravity(x, y, i, true, 95)) return;
   if (doDensityLiquid(x, y, i, OIL, 25, 50)) return;
+  if (doDensityLiquid(x, y, i, SNOW, 25, 50)) return;
+  if (doDensityLiquid(x, y, i, HUMAN, 7, 30)) return;
+  if (random() < 5) {
+    if (bordering(x, y, i, CORRUPT) !== -1) {
+      __doCorruption(x, y, i);
+      return;
+    }
+  }
 }
 
 function PLANT_ACTION(x, y, i) {
   doGrow(x, y, i, WATER, 50);
+  doGrow(x, y, i, CLONE, 10)
 
   if (random() < 5) {
     const saltLoc = bordering(x, y, i, SALT);
     if (saltLoc !== -1) {
       gameImagedata32[i] = BACKGROUND;
+      return;
+    }
+  }
+  if (random() < 5) {
+    if (bordering(x, y, i, CORRUPT) !== -1) {
+      __doCorruption(x, y, i);
       return;
     }
   }
@@ -303,6 +425,9 @@ function FIRE_ACTION(x, y, i) {
     var waterLoc = bordering(x, y, i, WATER);
     if (waterLoc === -1) waterLoc = bordering(x, y, i, SALT_WATER);
     if (waterLoc !== -1) {
+      gameImagedata32[waterLoc] = STEAM;
+      gameImagedata32[i] = BACKGROUND;
+      return;
       /* A thermite fire is not extinguished by water */
       if (bordering(x, y, i, BURNING_THERMITE) === -1) {
         gameImagedata32[waterLoc] = STEAM;
@@ -369,7 +494,9 @@ function FIRE_ACTION(x, y, i) {
           borderingElem === PLANT ||
           borderingElem === FUSE ||
           borderingElem === BRANCH ||
-          borderingElem === LEAF
+          borderingElem === LEAF ||
+          borderingElem === MYSTERY
+
         ) {
           flameOut = false;
           break;
@@ -411,18 +538,327 @@ function FIRE_ACTION(x, y, i) {
   }
 }
 
+function FIRE_CURSE_ACTION(x, y, i) {
+  /* water */
+  if (random() < 80) {
+    var waterLoc = bordering(x, y, i, WATER);
+    if (waterLoc === -1) waterLoc = bordering(x, y, i, SALT_WATER);
+    if (waterLoc !== -1) {
+      gameImagedata32[waterLoc] = STEAM;
+      gameImagedata32[i] = FIRE_CURSE;
+      return;
+    }
+  }
+
+  /* wax */
+  if (random() < 10) {
+    const waxLoc = bordering(x, y, i, WAX);
+    if (waxLoc !== -1) {
+      const waxXY = fastItoXYBordering(x, y, i, waxLoc);
+      gameImagedata32[waxLoc] = FIRE_CURSE;
+      const fallLoc = below(
+        Math.max(y, waxXY[1]),
+        Math.max(i, waxLoc),
+        BACKGROUND
+      );
+      if (fallLoc !== -1) gameImagedata32[fallLoc] = FALLING_WAX;
+      return;
+    }
+  }
+
+  /* flame out (unless in contact with element that needs to retain fire) */
+  if (random() < 40) {
+    var flameOut = true;
+
+    const xStart = Math.max(x - 1, 0);
+    const yStart = Math.max(y - 1, 0);
+    const xEnd = Math.min(x + 2, MAX_X_IDX + 1);
+    const yEnd = Math.min(y + 2, MAX_Y_IDX + 1);
+    var xIter, yIter;
+    for (yIter = yStart; yIter !== yEnd; yIter++) {
+      const idxBase = yIter * width;
+      for (xIter = xStart; xIter !== xEnd; xIter++) {
+        if (yIter === y && xIter === x) continue;
+
+        const idx = idxBase + xIter;
+        const borderingElemC = gameImagedata32[idx];
+
+        if (borderingElemC === FIRE_CURSE) continue;
+
+        if (
+          borderingElemC === BACKGROUND ||
+          borderingElemC === WATER ||
+          borderingElemC === SALT_WATER ||
+          borderingElemC === STEAM ||
+          borderingElemC === LAVA ||
+          borderingElemC === BEDROCK
+        ) {
+          flameOut = true;
+        } else {
+          if (random() < 60) {
+            gameImagedata32[idx] = FIRE_CURSE;
+            flameOut = false;
+            break;
+          }
+        }
+      }
+      if (!flameOut) break;
+    }
+
+    /* check for wax separately, since fire doesn't burn wax at corners */
+    if (flameOut && bordering(x, y, i, WAX) !== -1)
+      flameOut = false;
+
+    if (flameOut) {
+      gameImagedata32[i] = BACKGROUND;
+      return;
+    }
+  }
+
+  /* rising fire */
+  if (random() < 50) {
+    const riseLoc = above(y, i, BACKGROUND);
+    if (riseLoc !== -1) {
+      gameImagedata32[riseLoc] = FIRE_CURSE;
+      return;
+    }
+  }
+}
+
+function FIRE_BRIGHT_ACTION(x, y, i) {
+  /* water */
+  if (random() < 80) {
+    var waterLoc = bordering(x, y, i, WATER);
+    if (waterLoc === -1) waterLoc = bordering(x, y, i, SALT_WATER);
+    if (waterLoc !== -1) {
+      gameImagedata32[waterLoc] = STEAM;
+      gameImagedata32[i] = BACKGROUND;
+      return;
+    }
+  }
+
+  /* plant */
+  if (random() < 20) {
+    const plantLoc = borderingAdjacent(x, y, i, PLANT);
+    if (plantLoc !== -1) {
+      gameImagedata32[plantLoc] = FIRE_BRIGHT;
+      return;
+    }
+  }
+
+  /* wax */
+  if (random() < 1) {
+    const waxLoc = bordering(x, y, i, WAX);
+    if (waxLoc !== -1) {
+      const waxXY = fastItoXYBordering(x, y, i, waxLoc);
+      gameImagedata32[waxLoc] = FIRE_BRIGHT;
+      const fallLoc = below(
+        Math.max(y, waxXY[1]),
+        Math.max(i, waxLoc),
+        BACKGROUND
+      );
+      if (fallLoc !== -1) gameImagedata32[fallLoc] = FALLING_WAX;
+      return;
+    }
+  }
+
+  /* fuse */
+  if (random() < 80) {
+    const fuseLoc = borderingAdjacent(x, y, i, FUSE);
+    if (fuseLoc !== -1) {
+      gameImagedata32[fuseLoc] = FIRE_BRIGHT;
+      return;
+    }
+  }
+
+  /* flame out (unless in contact with element that needs to retain fire) */
+  if (random() < 40) {
+    var flameOut = true;
+
+    const xStart = Math.max(x - 1, 0);
+    const yStart = Math.max(y - 1, 0);
+    const xEnd = Math.min(x + 2, MAX_X_IDX + 1);
+    const yEnd = Math.min(y + 2, MAX_Y_IDX + 1);
+    var xIter, yIter;
+    for (yIter = yStart; yIter !== yEnd; yIter++) {
+      const idxBase = yIter * width;
+      for (xIter = xStart; xIter !== xEnd; xIter++) {
+        if (yIter === y && xIter === x) continue;
+
+        const idx = idxBase + xIter;
+        const borderingElem = gameImagedata32[idx];
+
+        if (borderingElem === FIRE_BRIGHT) continue;
+
+        if (
+          borderingElem === PLANT ||
+          borderingElem === FUSE ||
+          borderingElem === BRANCH ||
+          borderingElem === LEAF
+        ) {
+          flameOut = false;
+          break;
+        }
+
+        if (borderingElem === OIL && random() < 50) {
+          flameOut = false;
+          break;
+        }
+      }
+
+      if (!flameOut) break;
+    }
+
+    /* check for wax separately, since fire doesn't burn wax at corners */
+    if (flameOut && bordering(x, y, i, WAX) !== -1)
+      flameOut = false;
+
+    if (flameOut) {
+      gameImagedata32[i] = BACKGROUND;
+      return;
+    }
+  }
+
+  /* rising fire */
+  if (random() < 50) {
+    const riseLoc = above(y, i, BACKGROUND);
+    if (riseLoc !== -1) {
+      gameImagedata32[riseLoc] = FIRE_BRIGHT;
+      return;
+    }
+  }
+}
+
+function FIRE_BLUE_ACTION(x, y, i) {
+  /* water */
+  if (random() < 80) {
+    var waterLoc = bordering(x, y, i, WATER);
+    if (waterLoc === -1) waterLoc = bordering(x, y, i, SALT_WATER);
+    if (waterLoc !== -1) {
+      gameImagedata32[waterLoc] = STEAM;
+      gameImagedata32[i] = BACKGROUND;
+      return;
+    }
+  }
+
+  /* plant */
+  if (random() < 20) {
+    const plantLoc = borderingAdjacent(x, y, i, PLANT);
+    if (plantLoc !== -1) {
+      gameImagedata32[plantLoc] = FIRE_BLUE;
+      return;
+    }
+  }
+
+  /* wax */
+  if (random() < 1) {
+    const waxLoc = bordering(x, y, i, WAX);
+    if (waxLoc !== -1) {
+      const waxXY = fastItoXYBordering(x, y, i, waxLoc);
+      gameImagedata32[waxLoc] = FIRE_BLUE;
+      const fallLoc = below(
+        Math.max(y, waxXY[1]),
+        Math.max(i, waxLoc),
+        BACKGROUND
+      );
+      if (fallLoc !== -1) gameImagedata32[fallLoc] = FALLING_WAX;
+      return;
+    }
+  }
+
+  /* fuse */
+  if (random() < 80) {
+    const fuseLoc = borderingAdjacent(x, y, i, FUSE);
+    if (fuseLoc !== -1) {
+      gameImagedata32[fuseLoc] = FIRE_BLUE;
+      return;
+    }
+  }
+
+  /* flame out (unless in contact with element that needs to retain fire) */
+  if (random() < 40) {
+    var flameOut = true;
+
+    const xStart = Math.max(x - 1, 0);
+    const yStart = Math.max(y - 1, 0);
+    const xEnd = Math.min(x + 2, MAX_X_IDX + 1);
+    const yEnd = Math.min(y + 2, MAX_Y_IDX + 1);
+    var xIter, yIter;
+    for (yIter = yStart; yIter !== yEnd; yIter++) {
+      const idxBase = yIter * width;
+      for (xIter = xStart; xIter !== xEnd; xIter++) {
+        if (yIter === y && xIter === x) continue;
+
+        const idx = idxBase + xIter;
+        const borderingElem = gameImagedata32[idx];
+
+        if (borderingElem === FIRE_BLUE) continue;
+
+        if (
+          borderingElem === PLANT ||
+          borderingElem === FUSE ||
+          borderingElem === BRANCH ||
+          borderingElem === LEAF
+        ) {
+          flameOut = false;
+          break;
+        }
+
+        if (borderingElem === OIL && random() < 50) {
+          flameOut = false;
+          break;
+        }
+      }
+
+      if (!flameOut) break;
+    }
+
+    /* check for wax separately, since fire doesn't burn wax at corners */
+    if (flameOut && bordering(x, y, i, WAX) !== -1)
+      flameOut = false;
+
+    if (flameOut) {
+      gameImagedata32[i] = BACKGROUND;
+      return;
+    }
+  }
+
+  /* rising fire */
+  if (random() < 50) {
+    const riseLoc = above(y, i, BACKGROUND);
+    if (riseLoc !== -1) {
+      gameImagedata32[riseLoc] = FIRE_BLUE;
+      return;
+    }
+  }
+}
+
 function SALT_ACTION(x, y, i) {
   if (doGravity(x, y, i, true, 95)) return;
   if (doTransform(x, y, i, WATER, SALT_WATER, 25, 50)) return;
   if (doDensitySink(x, y, i, SALT_WATER, true, 25)) return;
+  if (random() < 5) {
+    if (bordering(x, y, i, CORRUPT) !== -1) {
+      __doCorruption(x, y, i);
+      return;
+    }
+  }
 }
 
 function SALT_WATER_ACTION(x, y, i) {
   if (doGravity(x, y, i, true, 95)) return;
   if (doDensityLiquid(x, y, i, WATER, 50, 50)) return;
+  if (doDensityLiquid(x, y, i, HUMAN, 5, 30)) return;
+  if (random() < 5) {
+    if (bordering(x, y, i, CORRUPT) !== -1) {
+      __doCorruption(x, y, i);
+      return;
+    }
+  }
 }
 
 function OIL_ACTION(x, y, i) {
+
   if (random() < 30) {
     if (bordering(x, y, i, FIRE) !== -1) {
       __doBorderBurn(x, y, i);
@@ -447,7 +883,7 @@ function TORCH_ACTION(x, y, i) {
 
 function GUNPOWDER_ACTION(x, y, i) {
   if (random() < 95) {
-    if (bordering(x, y, i, FIRE) !== -1) {
+    if ((bordering(x, y, i, FIRE) !== -1) || (bordering(x, y, i, FIRE_CURSE) !== -1)) {
       /* Chance to set off a star shaped explosion */
       if (
         random() < 1 &&
@@ -469,11 +905,49 @@ function GUNPOWDER_ACTION(x, y, i) {
   if (doGravity(x, y, i, true, 95)) return;
 }
 
-function WAX_ACTION(x, y, i) {}
+function FIREWORK_ACTION(x, y, i) {
+  if (random() < 35) {
+    if ((bordering(x, y, i, FIRE) !== -1) || (bordering(x, y, i, FIRE_CURSE) !== -1)) {
+      /* Chance to set off a star shaped explosion */
+      if (
+        random() < 1 &&
+        random() < 10 &&
+        particles.particleCounts[FIREWORK_PARTICLE] < 15
+      ) {
+        const particle = particles.addActiveParticle(UNKNOWN_PARTICLE, x, y, i);
+        if (particle) {
+          particle.setColor(FIRE);
+          particles.reinitializeParticle(particle, FIREWORK_PARTICLE);
+        }
+      } else {
+        particles.addActiveParticle(FIREWORK_PARTICLE, x, y, i);
+        gameImagedata32[i] = BACKGROUND;
+      }
+      return;
+    }
+  }
+
+  if (doGravity(x, y, i, true, 95)) return;
+}
+
+function WAX_ACTION(x, y, i) {
+  if (random() < 5) {
+    if (bordering(x, y, i, CORRUPT) !== -1) {
+      __doCorruption(x, y, i);
+      return;
+    }
+  }
+}
 
 function FALLING_WAX_ACTION(x, y, i) {
   if (doGravity(x, y, i, false, 100)) return;
   gameImagedata32[i] = WAX;
+  if (random() < 5) {
+    if (bordering(x, y, i, CORRUPT) !== -1) {
+      __doCorruption(x, y, i);
+      return;
+    }
+  }
 }
 
 function NITRO_ACTION(x, y, i) {
@@ -482,7 +956,7 @@ function NITRO_ACTION(x, y, i) {
   /* optimize for common case of being surrounded by nitro */
   if (surroundedByAdjacent(x, y, i, NITRO)) return;
 
-  if (borderingAdjacent(x, y, i, FIRE) !== -1) {
+  if ((borderingAdjacent(x, y, i, FIRE) !== -1) || (borderingAdjacent(x, y, i, FIRE_CURSE) !== -1)) {
     if (random() < 30) {
       if (!particles.addActiveParticle(NITRO_PARTICLE, x, y, i)) return;
       __doBorderBurn(x, y, i);
@@ -502,7 +976,7 @@ function NITRO_ACTION(x, y, i) {
 }
 
 function NAPALM_ACTION(x, y, i) {
-  if (random() < 25 && bordering(x, y, i, FIRE) !== -1) {
+  if ((random() < 25 && bordering(x, y, i, FIRE) !== -1) || (random() < 25 && bordering(x, y, i, FIRE_CURSE) !== -1)) {
     if (!particles.addActiveParticle(NAPALM_PARTICLE, x, y, i)) {
       gameImagedata32[i] = FIRE;
     }
@@ -513,7 +987,7 @@ function NAPALM_ACTION(x, y, i) {
 }
 
 function C4_ACTION(x, y, i) {
-  if (random() < 60 && bordering(x, y, i, FIRE) !== -1) {
+  if ((random() < 60 && bordering(x, y, i, FIRE) !== -1) || (random() < 60 && bordering(x, y, i, FIRE_CURSE) !== -1)) {
     if (!particles.addActiveParticle(C4_PARTICLE, x, y, i)) {
       gameImagedata32[i] = FIRE;
     }
@@ -545,7 +1019,7 @@ function CONCRETE_ACTION(x, y, i) {
   if (random() < 10 && random() < 10 && random() < 5) gameImagedata32[i] = WALL;
 }
 
-function FUSE_ACTION(x, y, i) {}
+function FUSE_ACTION(x, y, i) { }
 
 function ICE_ACTION(x, y, i) {
   /*
@@ -600,6 +1074,13 @@ function ICE_ACTION(x, y, i) {
       return;
     }
   }
+
+  if (random() < 5) {
+    if (bordering(x, y, i, CORRUPT) !== -1) {
+      __doCorruption(x, y, i);
+      return;
+    }
+  }
 }
 
 function CHILLED_ICE_ACTION(x, y, i) {
@@ -607,6 +1088,13 @@ function CHILLED_ICE_ACTION(x, y, i) {
   if (random() < 6) {
     gameImagedata32[i] = ICE;
     return;
+  }
+
+  if (random() < 5) {
+    if (bordering(x, y, i, CORRUPT) !== -1) {
+      __doCorruption(x, y, i);
+      return;
+    }
   }
 
   /*
@@ -637,9 +1125,11 @@ const __lava_immune = [
   FIRE,
   WALL,
   ROCK,
+  BEDROCK,
   WATER,
   SALT_WATER,
   STEAM,
+  CORRUPT
 ];
 Object.freeze(__lava_immune);
 const __num_lava_immune = __lava_immune.length;
@@ -767,6 +1257,13 @@ function ROCK_ACTION(x, y, i) {
     if (doDensitySink(x, y, i, LAVA, false, 20)) return;
   }
 
+  if (random() < 5) {
+    if (bordering(x, y, i, CORRUPT) !== -1) {
+      __doCorruption(x, y, i);
+      return;
+    }
+  }
+
   if (doGravity(x, y, i, false, 99)) return;
 
   /* Produce METHANE when in contact with OIL */
@@ -788,6 +1285,13 @@ function STEAM_ACTION(x, y, i) {
   if (random() < 5) {
     if (bordering(x, y, i, WATER) !== -1) {
       gameImagedata32[i] = WATER;
+      return;
+    }
+  }
+
+  if (random() < 5) {
+    if (bordering(x, y, i, CORRUPT) !== -1) {
+      __doCorruption(x, y, i);
       return;
     }
   }
@@ -867,6 +1371,13 @@ function CRYO_ACTION(x, y, i) {
     }
   }
 
+  if (random() < 5) {
+    if (bordering(x, y, i, CORRUPT) !== -1) {
+      __doCorruption(x, y, i);
+      return;
+    }
+  }
+
   if (doGravity(x, y, i, true, 95)) return;
 
   /* Freeze even if there are no nearby freezable surfaces */
@@ -876,6 +1387,11 @@ function CRYO_ACTION(x, y, i) {
       return;
     }
   }
+}
+
+function CORRUPT_ACTION(x, y, i) {
+  /*Destroys all life*/
+  if (doGravity(x, y, i, true, 70)) return;
 }
 
 function MYSTERY_ACTION(x, y, i) {
@@ -938,7 +1454,7 @@ function MYSTERY_ACTION(x, y, i) {
 }
 
 function METHANE_ACTION(x, y, i) {
-  if (random() < 25 && bordering(x, y, i, FIRE) !== -1) {
+  if ((random() < 25 && bordering(x, y, i, FIRE) !== -1) || (random() < 25 && bordering(x, y, i, FIRE_CURSE) !== -1)) {
     if (!particles.addActiveParticle(METHANE_PARTICLE, x, y, i)) {
       gameImagedata32[i] = FIRE;
     }
@@ -953,6 +1469,13 @@ function METHANE_ACTION(x, y, i) {
 
 function SOIL_ACTION(x, y, i) {
   if (doGravity(x, y, i, false, 99)) return;
+
+  if (random() < 5) {
+    if (bordering(x, y, i, CORRUPT) !== -1) {
+      __doCorruption(x, y, i);
+      return;
+    }
+  }
 
   /* Optimize for common case; can't sink through SOIL */
   if (y !== MAX_Y_IDX && uniformBelowAdjacent(x, y, i) !== SOIL) {
@@ -978,6 +1501,13 @@ function WET_SOIL_ACTION(x, y, i) {
     const waterLoc = aboveAdjacent(x, y, i, WATER);
     if (waterLoc !== -1) {
       gameImagedata32[waterLoc] = BACKGROUND;
+    }
+  }
+
+  if (random() < 5) {
+    if (bordering(x, y, i, CORRUPT) !== -1) {
+      __doCorruption(x, y, i);
+      return;
     }
   }
 
@@ -1007,17 +1537,34 @@ function WET_SOIL_ACTION(x, y, i) {
 }
 
 function BRANCH_ACTION(x, y, i) {
+  doGrow(x, y, i, CLONE, 5)
+
   if (random() < 3) {
     if (borderingAdjacent(x, y, i, FIRE) !== -1) {
       gameImagedata32[i] = FIRE;
     }
   }
+  if (random() < 5) {
+    if (bordering(x, y, i, CORRUPT) !== -1) {
+      __doCorruption(x, y, i);
+      return;
+    }
+  }
 }
 
 function LEAF_ACTION(x, y, i) {
+  doGrow(x, y, i, CLONE, 5)
+
   if (random() < 5) {
     if (borderingAdjacent(x, y, i, FIRE) !== -1) {
       gameImagedata32[i] = FIRE;
+    }
+  }
+
+  if (random() < 5) {
+    if (bordering(x, y, i, CORRUPT) !== -1) {
+      __doCorruption(x, y, i);
+      return;
     }
   }
 
@@ -1033,6 +1580,13 @@ function LEAF_ACTION(x, y, i) {
 }
 
 function POLLEN_ACTION(x, y, i) {
+  if (random() < 5) {
+    if (bordering(x, y, i, CORRUPT) !== -1) {
+      __doCorruption(x, y, i);
+      return;
+    }
+  }
+
   if (doGravity(x, y, i, true, 95)) return;
 }
 
@@ -1046,7 +1600,7 @@ function CHARGED_NITRO_ACTION(x, y, i) {
     if (doDensitySink(x, y, i, POLLEN, true, 25)) return;
   }
 
-  if (borderingAdjacent(x, y, i, FIRE) !== -1) {
+  if ((borderingAdjacent(x, y, i, FIRE) !== -1) || (borderingAdjacent(x, y, i, FIRE_CURSE) !== -1)) {
     particles.addActiveParticle(CHARGED_NITRO_PARTICLE, x, y, i);
     gameImagedata32[i] = FIRE;
     return;
@@ -1194,6 +1748,207 @@ function BURNING_THERMITE_ACTION(x, y, i) {
   if (doDensitySink(x, y, i, OIL, false, 95)) return;
 }
 
+
+function HUMAN_ACTION(x, y, i) {
+  /*Finally, intelligent(?) life*/
+
+  if (
+    (adjacent(x, i, WALL) !== -1) ||
+    (adjacent(x, i, BRANCH) !== -1) ||
+    (adjacent(x, i, PLANT) !== -1) ||
+    (adjacent(x, i, LEAF) !== -1) ||
+    (adjacent(x, i, FUSE) !== -1) ||
+    (adjacent(x, i, ROCK) !== -1) ||
+    (adjacent(x, i, SOIL) !== -1)
+  ) {
+    /*Climbing*/
+    if (
+      (adjacentRight(x, i, WALL) !== -1) ||
+      (adjacentRight(x, i, BRANCH) !== -1) ||
+      (adjacentRight(x, i, PLANT) !== -1) ||
+      (adjacentRight(x, i, LEAF) !== -1) ||
+      (adjacentRight(x, i, FUSE) !== -1) ||
+      (adjacentRight(x, i, ROCK) !== -1) ||
+      (adjacentRight(x, i, SOIL) !== -1)
+    ) {
+      doRise(x, y, i, 60, 0);
+      doRise(x, y, i, 30, 0);
+      moveRight(x, i, 50);
+      moveRight(x, i, 25);
+    }
+    if (
+      (adjacentLeft(x, i, WALL) !== -1) ||
+      (adjacentLeft(x, i, BRANCH) !== -1) ||
+      (adjacentLeft(x, i, PLANT) !== -1) ||
+      (adjacentLeft(x, i, LEAF) !== -1) ||
+      (adjacentLeft(x, i, FUSE) !== -1) ||
+      (adjacentLeft(x, i, ROCK) !== -1) ||
+      (adjacentLeft(x, i, SOIL) !== -1)
+    ) {
+      doRise(x, y, i, 60, 0);
+      moveLeft(x, i, 50);
+      moveLeft(x, i, 25);
+    }
+  } else {
+    /*General movement*/
+    if ((adjacentLeft(x, i, BACKGROUND) !== -1) && (adjacentRight(x, i, BACKGROUND) !== -1)) {
+      if (random() < 50) {
+        doRise(x, y, i, 5, 0);
+        walkAround(x, i, 75);
+      }
+    } else if (adjacentLeft(x, i, BACKGROUND) !== -1) {
+      doRise(x, y, i, 5, 0);
+      moveLeft(x, i, 40);
+    } else if (adjacentRight(x, i, BACKGROUND) !== -1) {
+      doRise(x, y, i, 5, 0);
+      moveRight(x, i, 40);
+    }
+  }
+  /*Code so that humans try to avoid standing on each other*/
+  if (belowAdjacent(x, y, i, HUMAN) !== -1) {
+    const slide = true;
+    doMoveAround(x, y, i, true, 95);
+  } else {
+    slide = false;
+  }
+
+  /*Bordering instances*/
+  if (bordering(x, y, i, CLONE) !== -1) {
+    if (random() < 5) {
+    particles.addActiveParticle(HUMAN_PARTICLE, x, y, i);
+    }
+  }
+  if (bordering(x, y, i, CORRUPT) !== -1) {
+    __doCorruption(x, y, i);
+    return;
+  }
+
+  if (doGravity(x, y, i, slide, 95)) return;
+}
+
+function HUMAN_MAKER_ACTION(x, y, i) {
+  if (random() < 50) {
+    var flameOut = true;
+
+    const xStart = Math.max(x - 1, 0);
+    const yStart = Math.max(y - 1, 0);
+    const xEnd = Math.min(x + 2, MAX_X_IDX + 1);
+    const yEnd = Math.min(y + 2, MAX_Y_IDX + 1);
+    var xIter, yIter;
+    for (yIter = yStart; yIter !== yEnd; yIter++) {
+      const idxBase = yIter * width;
+      for (xIter = xStart; xIter !== xEnd; xIter++) {
+        if (yIter === y && xIter === x) continue;
+
+        const idx = idxBase + xIter;
+        const borderingElem = gameImagedata32[idx];
+      }
+      if (!flameOut) break;
+    }
+
+    /* check for wax separately, since fire doesn't burn wax at corners */
+    if (flameOut && bordering(x, y, i, BACKGROUND) !== -1)
+      flameOut = true;
+
+    if (flameOut) {
+      gameImagedata32[i] = BACKGROUND;
+      return;
+    }
+  }
+}
+
+function THANOS_ACTION(x, y, i) {
+  /* Inevitable */
+  if ((borderingAdjacent(x, y, i, FIRE) !== -1) || (borderingAdjacent(x, y, i, FIRE_CURSE) !== -1)) {
+    particles.addActiveParticle(SNAP_PARTICLE, x, y, i);
+    gameImagedata32[i] = BACKGROUND;
+  }
+  if (doGravity(x, y, i, true, 95)) return;
+}
+
+function DUST_ACTION(x, y, i) {
+  /* Dust to dust, ashes to ashes */
+  if (doGravity(x, y, i, true, 85)) return;
+}
+
+function NANITES_ACTION(x, y, i) {
+  /* Clones from a surrounding surface */
+  const xStart = Math.max(x - 1, 0);
+  const yStart = Math.max(y - 1, 0);
+  const xEnd = Math.min(x + 2, MAX_X_IDX + 1);
+  const yEnd = Math.min(y + 2, MAX_Y_IDX + 1);
+  var xIter, yIter;
+  for (yIter = yStart; yIter !== yEnd; yIter++) {
+    const idxBase = yIter * width;
+    for (xIter = xStart; xIter !== xEnd; xIter++) {
+      if (yIter === y && xIter === x) continue;
+
+      const idx = idxBase + xIter;
+      const borderingElem = gameImagedata32[idx];
+
+      if (borderingElem === NANITES) continue;
+
+      if (
+        borderingElem === BACKGROUND
+      ) {
+        gameImagedata32[idx] = BACKGROUND;
+      } else {
+        if (random() < 50) {
+          gameImagedata32[i] = borderingElem;
+        }
+      }
+    }
+  }
+}
+
+function SPICE_ACTION(x, y, i) {
+  /*For when normal explosives don't have enough BOOM*/
+  if ((borderingAdjacent(x, y, i, FIRE) !== -1) || (borderingAdjacent(x, y, i, FIRE_CURSE) !== -1)) {
+    if (random() < 20) particles.addActiveParticle(NITRO_PARTICLE, x, y, i);
+    if (random() < 15) particles.addActiveParticle(NAPALM_PARTICLE, x, y, i);
+    if (random() < 10) particles.addActiveParticle(C4_PARTICLE, x, y, i);
+    if (random() < 5) particles.addActiveParticle(LAVA_PARTICLE, x, y, i);
+    if (random() < 10) particles.addActiveParticle(METHANE_PARTICLE, x, y, i);
+    if (random() < 10) particles.addActiveParticle(CHARGED_NITRO_PARTICLE, x, y, i);
+    if (random() < 10) particles.addActiveParticle(CHARGED_CURSE_PARTICLE, x, y, i);
+    if (random() < 10) particles.addActiveParticle(FIREWORK_PARTICLE, x, y, i);
+    if (random() < 10) particles.addActiveParticle(CURSEWORK_PARTICLE, x, y, i);
+  }
+  if (doMoveAround(x, y, i, false, 10)) return;
+  if (doGravity(x, y, i, true, 95)) return;
+}
+
+function CLONE_ACTION(x, y, i) {
+  if (random() < 25) {
+    var flameOut = true;
+
+    const xStart = Math.max(x - 1, 0);
+    const yStart = Math.max(y - 1, 0);
+    const xEnd = Math.min(x + 2, MAX_X_IDX + 1);
+    const yEnd = Math.min(y + 2, MAX_Y_IDX + 1);
+    var xIter, yIter;
+    for (yIter = yStart; yIter !== yEnd; yIter++) {
+      const idxBase = yIter * width;
+      for (xIter = xStart; xIter !== xEnd; xIter++) {
+        if (yIter === y && xIter === x) continue;
+
+        const idx = idxBase + xIter;
+        const borderingElem = gameImagedata32[idx];
+      }
+      if (!flameOut) break;
+    }
+
+    /* check for wax separately, since fire doesn't burn wax at corners */
+    if (flameOut && bordering(x, y, i, BACKGROUND) !== -1)
+      flameOut = true;
+
+    if (flameOut) {
+      gameImagedata32[i] = BACKGROUND;
+      return;
+    }
+  }
+}
+
 /*  =============================== Helpers =============================== */
 
 function __pickRandValid(a, b) {
@@ -1276,6 +2031,26 @@ function adjacent(x, i, type) {
     x !== MAX_X_IDX && gameImagedata32[rightSpot] === type ? rightSpot : -1;
 
   return __pickRandValid(leftMatch, rightMatch);
+}
+
+/* Checks left. */
+function adjacentLeft(x, i, type) {
+  const leftSpot = i - 1;
+
+  const leftMatchCheck =
+    x !== 0 && gameImagedata32[leftSpot] === type ? leftSpot : -1;
+
+  return leftMatchCheck;
+}
+
+/* Checks right. */
+function adjacentRight(x, i, type) {
+  const rightSpot = i + 1;
+
+  const rightMatchCheck =
+    x !== MAX_X_IDX && gameImagedata32[rightSpot] === type ? rightSpot : -1;
+
+  return rightMatchCheck;
 }
 
 /* Checks up, down, left, and right. Does not check corners. */
@@ -1416,6 +2191,100 @@ function doGravity(x, y, i, fallAdjacent, chance) {
   return false;
 }
 
+function doMoveAround(x, y, i, moveAdjacent, chance) {
+  if (random() >= chance) return false;
+
+  if (y === MAX_Y_IDX) {
+    gameImagedata32[i] = BACKGROUND;
+    return true;
+  }
+
+  var newI;
+
+  if (moveAdjacent) newI = above(x, y, i, BACKGROUND);
+  else newI = adjacent(y, i, BACKGROUND);
+
+  if (newI === -1 && moveAdjacent) newI = adjacent(x, i, BACKGROUND);
+
+  if (newI !== -1) {
+    gameImagedata32[newI] = gameImagedata32[i];
+    gameImagedata32[i] = BACKGROUND;
+    return true;
+  }
+
+  return false;
+}
+
+function moveLeft(x, i, chance) {
+  if (random() >= chance) return false;
+
+  if (x === 0) {
+    gameImagedata32[i] = BACKGROUND;
+    return true;
+  }
+
+  var newI = adjacentLeft(x, i, BACKGROUND);
+
+  if (newI !== -1) {
+    gameImagedata32[newI] = gameImagedata32[i];
+    gameImagedata32[i] = BACKGROUND;
+    return true;
+  } else {
+    gameImagedata32[newI] = BACKGROUND;
+  }
+
+  return false;
+}
+
+function moveRight(x, i, chance) {
+  if (random() >= chance) return false;
+
+  if (x === MAX_X_IDX) {
+    gameImagedata32[i] = BACKGROUND;
+    return true;
+  }
+
+  var newI = adjacentRight(x, i, BACKGROUND);
+
+  if (newI !== -1) {
+    gameImagedata32[newI] = gameImagedata32[i];
+    gameImagedata32[i] = BACKGROUND;
+    return true;
+  } else {
+    gameImagedata32[newI] = BACKGROUND;
+  }
+
+  return false;
+}
+
+function walkAround(x, i, chance) {
+  if (random() >= chance) return false;
+
+  if (x === MAX_X_IDX) {
+    gameImagedata32[i] = BACKGROUND;
+    return true;
+  }
+
+  var newILeft = adjacentLeft(x, i, BACKGROUND);
+  var newIRight = adjacentRight(x, i, BACKGROUND);
+
+  var newIDirect = __pickRandValid(newILeft, newIRight);
+  var oldI = gameImagedata32[i];
+
+  var newI = __pickRandValid(newIDirect, oldI);
+
+  if ((newI !== -1) && (newI === newIDirect)) {
+    gameImagedata32[newI] = gameImagedata32[i];
+    gameImagedata32[i] = BACKGROUND;
+    return true;
+  } else {
+    gameImagedata32[newI] = gameImagedata32[i];
+    return true;
+  }
+
+  return false;
+}
+
 /*
  * Note that this will not behave *exactly* like an inverse to
  * the gravity function. This is because the assumption that
@@ -1496,6 +2365,15 @@ function __doBorderBurn(x, y, i) {
   if (x !== MAX_X_IDX) gameImagedata32[i + 1] = FIRE;
 
   gameImagedata32[i] = FIRE;
+}
+
+function __doCorruption(x, y, i) {
+  if (y !== 0) gameImagedata32[i - width] = CORRUPT;
+  if (y !== MAX_Y_IDX) gameImagedata32[i + width] = CORRUPT;
+  if (x !== 0) gameImagedata32[i - 1] = CORRUPT;
+  if (x !== MAX_X_IDX) gameImagedata32[i + 1] = CORRUPT;
+
+  gameImagedata32[i] = CORRUPT;
 }
 
 function __doGunpowderExplosion(x, y, i) {

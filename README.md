@@ -1,6 +1,32 @@
-# Project Sand
+# Project Sand: Gone Nuts
 
-Overview
+AltruisticNut's Notes
+---------
+
+Hey, this is a fork of Josh Don's "Project Sand" but I added a lot of potentially useless things, including:
+
++ Elements only accessible by interactions between two unique elements are now placeable.
++ Several elements I created myself, which are:
+  + Corrupt
+  + Firework
+  + Bedrock
+  + Snow
+  + Cursed Fire
+  + Humans
+  + Nanites
+  + Spice of Life
+  + Reproduction
++ Several UI changes and keybinds for some of the functions.
++ Possibly countless bugs from my own codetti or from updating it from a originally year-old version
+
+More information can be found in TIPSANDNOTESGN.md. You can read the original README.md below.
+
+
+Have fun and enjoy. Pull requests about suggestions and bugs appreciated.
+
+-AltruisticNut
+
+Original Overview
 --------
 
 In the early to mid 2000s, there were a series of Java applet based games based around a falling sand mechanic - collectively known as "Falling Sand Games". One of the most popular versions was referred to as the "Hell of Sand Falling Game". The website [http://androdome.com/Sand/](http://androdome.com/Sand/) provides a relatively detailed history of these applets.
