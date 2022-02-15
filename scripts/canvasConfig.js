@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const __max_width = 1000;
+const __max_width = 950;
 const __max_height = 500;
 
 /* Need to use a smaller size when on mobile devices with small screens */

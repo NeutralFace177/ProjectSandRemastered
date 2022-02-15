@@ -24,6 +24,9 @@ var PENSIZE;
 var SELECTED_ELEM;
 var OVERWRITE_ENABLED;
 
+/*I put the Mating Season modifier here since at it's core it was heavily reliant and inspired by the OVERWRITE_ENABLED variable.*/
+var MS_ENABLED;
+
 /*
  * Offscreen canvas for drawing user stroke. We draw on
  * this canvas and then transfer the data to the main
@@ -120,6 +123,8 @@ class Cursor {
 
   documentCursorUp() {
     this.isDown = false;
+    aUndoSaveGameCanvas();
+    undoSaveGameCanvas();
   }
 
   documentCursorDown(e, getPos) {
@@ -611,7 +616,7 @@ function initCursors() {
   PENSIZE = PEN_SIZES[DEFAULT_PEN_IDX];
   SELECTED_ELEM = WALL;
   OVERWRITE_ENABLED = true;
-
+  MS_ENABLED = false;
   /* Set up direction constants for drawing straight lines */
   Mouse.NO_DIRECTION = 0;
   Mouse.HORIZONTAL = 1;

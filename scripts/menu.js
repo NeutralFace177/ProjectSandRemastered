@@ -28,9 +28,9 @@ const DEFAULT_PEN_IDX = 2;
 const elementMenuItems = [
   WALL, SAND, WATER, PLANT, FIRE, SPOUT, WELL, SALT, OIL, WAX, 
   TORCH, ICE, GUNPOWDER, NAPALM, NITRO, C4, LAVA, CRYO, FUSE, MYSTERY,
-  CONCRETE, METHANE, SOIL, ACID, THERMITE, BACKGROUND, CHARGED_NITRO, BRANCH, LEAF, POLLEN, 
-  SALT_WATER, STEAM, FALLING_WAX, ROCK, WET_SOIL, CHILLED_ICE, CORRUPT, FIREWORK, BEDROCK, SNOW, FIRE_CURSE, HUMAN, 
-  NANITES, SPICE, CLONE
+  CONCRETE, METHANE, SOIL, ACID, THERMITE, BURNING_THERMITE, BACKGROUND, CHARGED_NITRO, BRANCH, LEAF, 
+  POLLEN, SALT_WATER, STEAM, FALLING_WAX, ROCK, WET_SOIL, CHILLED_ICE, CORRUPT, FIREWORK, BEDROCK, 
+  SNOW, FIRE_CURSE, HUMAN, NANITES, SPICE, CLONE, FACTORY, THANOS, DEEPSAND
 ];
 
 const menuNames = {};
@@ -73,6 +73,7 @@ menuNames[CORRUPT] = "CORRUPT";
 menuNames[MYSTERY] = "???";
 menuNames[ACID] = "ACID";
 menuNames[THERMITE] = "THERMITE";
+menuNames[BURNING_THERMITE] = "BURNING THERMITE";
 menuNames[SOIL] = "SOIL";
 menuNames[WET_SOIL] = "WET SOIL";
 menuNames[HUMAN] = "HUMANS";
@@ -80,6 +81,8 @@ menuNames[THANOS] = "THANOS";
 menuNames[NANITES] = "NANITES";
 menuNames[SPICE] = "SPICE OF LIFE";
 menuNames[CLONE] = "REPRODUCTION";
+menuNames[FACTORY] = "PORTASPIGOT";
+menuNames[DEEPSAND] = "DEEPSAND";
 
 /*
  * Some element colors do not have very good contrast against
@@ -92,6 +95,7 @@ menuAltColors[WALL] = "rgb(160, 160, 160)";
 menuAltColors[BACKGROUND] = "rgb(200, 100, 200)";
 menuAltColors[WELL] = "rgb(158, 13, 33)";
 menuAltColors[SOIL] = "rgb(171, 110, 53)";
+menuAltColors[DEEPSAND] = "rgb(68, 72, 115)";
 
 function initMenu() {
   /* The wrapper div that holds the entire menu */
@@ -169,17 +173,20 @@ function initMenu() {
   });
 
   /* Set up spigot size options */
+  /*The 5th spigot's size is actually unecessary, since FACTORY always operates at a fixed rate, but it's needed by the function since it runs a check for both a type and a size.*/
   const spigotTypes = [
     document.getElementById("spigot1Type"),
     document.getElementById("spigot2Type"),
     document.getElementById("spigot3Type"),
     document.getElementById("spigot4Type"),
+    document.getElementById("spigot5Type"),
   ];
   const spigotSizes = [
     document.getElementById("spigot1Size"),
     document.getElementById("spigot2Size"),
     document.getElementById("spigot3Size"),
     document.getElementById("spigot4Size"),
+    document.getElementById("spigot5Size"),
   ];
   if (spigotTypes.length !== spigotSizes.length) throw "should be same length";
   for (i = 0; i < spigotTypes.length; i++) {
@@ -220,6 +227,9 @@ function initMenu() {
   spigotTypes[3].addEventListener("change", function () {
     SPIGOT_ELEMENTS[3] = parseInt(spigotTypes[3].value, 10);
   });
+  spigotTypes[4].addEventListener("change", function () {
+    SPIGOT_ELEMENTS[4] = parseInt(spigotTypes[4].value, 10);
+  });
   spigotSizes[0].addEventListener("change", function () {
     SPIGOT_SIZES[0] = parseInt(spigotSizes[0].value, 10);
   });
@@ -232,12 +242,22 @@ function initMenu() {
   spigotSizes[3].addEventListener("change", function () {
     SPIGOT_SIZES[3] = parseInt(spigotSizes[3].value, 10);
   });
+  spigotSizes[4].addEventListener("change", function () {
+    SPIGOT_SIZES[4] = parseInt(spigotSizes[4].value, 10);
+  });
 
   /* 'overwrite' checkbox */
   const overwriteCheckbox = document.getElementById("overwriteCheckbox");
   overwriteCheckbox.checked = OVERWRITE_ENABLED;
   overwriteCheckbox.addEventListener("click", function () {
     OVERWRITE_ENABLED = overwriteCheckbox.checked;
+  });
+
+  /* mating season checkbox*/
+  const seasonCheckbox = document.getElementById("seasonCheckbox");
+  seasonCheckbox.checked = MS_ENABLED;
+  seasonCheckbox.addEventListener("click", function () {
+    MS_ENABLED = seasonCheckbox.checked;
   });
 
   /* speed slider */
@@ -266,6 +286,12 @@ function initMenu() {
 
    /*Menu keybinds*/
   document.addEventListener('keydown', function(m) {
+    /*z - Undo*/
+    if (m.which === 17) {
+      undoLoadGameCanvas();
+      aUndoLoadGameCanvas();
+    }
+
     /*s - Defaut FPS*/
     if (m.which === 83) {
       speedSlider.value = DEFAULT_FPS;
@@ -297,13 +323,23 @@ function initMenu() {
 
     /*Space Bar - Overwrite Checkbox*/
     if (m.which === 32) {
-      
       if (overwriteCheckbox.checked !== false) {
         overwriteCheckbox.checked = false;
         OVERWRITE_ENABLED = false;
       } else {
         overwriteCheckbox.checked = true;
         OVERWRITE_ENABLED = true;
+      } 
+    }
+
+    /*f - Mating Season (MS) Checkbox*/
+    if (m.which === 70) {
+      if (seasonCheckbox.checked !== true) {
+        seasonCheckbox.checked = true;
+        MS_ENABLED = true;
+      } else {
+        seasonCheckbox.checked = false;
+        MS_ENABLED = false;
       } 
     }
   });

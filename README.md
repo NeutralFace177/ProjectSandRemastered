@@ -1,9 +1,9 @@
 # Project Sand: Gone Nuts
 
 AltruisticNut's Notes
----------
+---------------------
 
-Hey, this is a fork of Josh Don's "Project Sand" but I added a lot of potentially useless things, including:
+Hey, this is a fork of Josh Don's "Project Sand" but I added a lot of random things, including:
 
 + Elements only accessible by interactions between two unique elements are now placeable.
 + Several elements I created myself, which are:
@@ -16,13 +16,15 @@ Hey, this is a fork of Josh Don's "Project Sand" but I added a lot of potentiall
   + Nanites
   + Spice of Life
   + Reproduction
+  + ... and more along the way!
 + Several UI changes and keybinds for some of the functions.
 + Possibly countless bugs from my own codetti or from updating it from a originally year-old version
 
-More information can be found in TIPSANDNOTESGN.md. You can read the original README.md below.
+IMPORTANT NOTE: This version can get a bit laggier than the original, due to the canvas size increase and my own code quality not up to snuff with Josh Don.
 
+More information can be found in GNLIST.md. You can read the original README.md below.
 
-Have fun and enjoy. Pull requests about suggestions and bugs appreciated.
+Have fun and enjoy. Pull requests about suggestions, bugs, and optimizations appreciated.
 
 -AltruisticNut
 

@@ -23,7 +23,6 @@ const SPIGOT_ELEMENT_OPTIONS = [
   WATER,
   SALT,
   OIL,
-  FALLING_WAX,
   GUNPOWDER,
   FIREWORK,
   NITRO,
@@ -32,21 +31,26 @@ const SPIGOT_ELEMENT_OPTIONS = [
   POLLEN,
   NAPALM,
   CONCRETE,
+  FALLING_WAX,
   LAVA,
   ROCK,
+  DEEPSAND,
   CORRUPT,
   SALT_WATER,
   CRYO,
   SNOW,
   ACID,
+  THERMITE,
   MYSTERY,
+  THANOS,
   HUMAN,
-  SPICE
+  SPICE,
 ];
 const SPIGOT_SIZE_OPTIONS = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100];
 const DEFAULT_SPIGOT_SIZE_IDX = 0;
 
-/* Type and size of each spigot. Controlled via the menu. */
+/* Type and size of each spigot. Controlled via the menu.  *The 5th spigot used for FACTORY isn't here, since it's only meant to operate for that element.
+ */
 const SPIGOT_ELEMENTS = [SAND, WATER, SALT, OIL];
 const SPIGOT_SIZES = [];
 

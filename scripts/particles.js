@@ -56,10 +56,9 @@ const TREE_PARTICLE = 8;
 const CHARGED_NITRO_PARTICLE = 9;
 const NUKE_PARTICLE = 10;
 const FIREWORK_PARTICLE = 11;
-const SNAP_PARTICLE = 12;
-const CURSEWORK_PARTICLE = 13;
-const CHARGED_CURSE_PARTICLE = 14;
-const HUMAN_PARTICLE = 15;
+const CURSEWORK_PARTICLE = 12;
+const CHARGED_CURSE_PARTICLE = 13;
+const HUMAN_PARTICLE = 14;
 
 const __particleInit = [
   UNKNOWN_PARTICLE_INIT,
@@ -74,7 +73,6 @@ const __particleInit = [
   CHARGED_NITRO_PARTICLE_INIT,
   NUKE_PARTICLE_INIT,
   FIREWORK_PARTICLE_INIT,
-  SNAP_PARTICLE_INIT,
   CURSEWORK_PARTICLE_INIT,
   CHARGED_CURSE_PARTICLE_INIT,
   HUMAN_PARTICLE_INIT
@@ -94,7 +92,6 @@ const __particleActions = [
   CHARGED_NITRO_PARTICLE_ACTION,
   NUKE_PARTICLE_ACTION,
   FIREWORK_PARTICLE_ACTION,
-  SNAP_PARTICLE_ACTION,
   CURSEWORK_PARTICLE_ACTION,
   CHARGED_CURSE_PARTICLE_ACTION,
   HUMAN_PARTICLE_ACTION
@@ -248,9 +245,8 @@ function LAVA_PARTICLE_ACTION(particle) {
 }
 
 function FIREWORK_PARTICLE_INIT(particle) {
-  if (random() < 34) particle.setColor(FIRE);
-  if (random() < 33) particle.setColor(FIRE_BLUE);
-  if (random() < 33) particle.setColor(FIRE_BRIGHT);
+  /* Clone of LAVA_PARTICLE. Changes some numbers, interactions and the fire spewed out. */
+  particle.setRandomColor(FIREWORK_COLORS);
  
   /* Make it harder for the angle to be steep */
   var angle = QUARTER_PI + Math.random() * HALF_PI;
@@ -319,6 +315,7 @@ function FIREWORK_PARTICLE_ACTION(particle) {
 }
 
 function CURSEWORK_PARTICLE_INIT(particle) {
+  /* Clone of FIREWORK_PARTICLE. Now with cursed fire! */
   particle.setColor(FIRE_CURSE);
   /* Make it harder for the angle to be steep */
   var angle = QUARTER_PI + Math.random() * HALF_PI;
@@ -677,11 +674,15 @@ function CHARGED_NITRO_PARTICLE_INIT(particle) {
   particle.xVelocity = 0;
   particle.yVelocity = -100;
 
-  /* Search upwards for a WALL collision (but don't check every pixel) */
+  /* Search upwards for a WALL/BEDROCK collision (but don't check every pixel) */
   particle.minY = -1;
   const step = (3 + Math.round(Math.random() * 2)) * width;
   for (var idx = particle.i; idx > -1; idx -= step) {
     if (gameImagedata32[idx] === WALL) {
+      particle.minY = idx / width;
+      break;
+    }
+    if (gameImagedata32[idx] === BEDROCK) {
       particle.minY = idx / width;
       break;
     }
@@ -706,8 +707,9 @@ function CHARGED_NITRO_PARTICLE_ACTION(particle) {
 }
 
 function CHARGED_CURSE_PARTICLE_INIT(particle) {
+  /* Clone of CHARGED_NITRO_PARTICLE. Now with cursed fire! */
   particle.setColor(FIRE_CURSE);
-  particle.size = 4;
+  particle.size = 6;
   particle.xVelocity = 0;
   particle.yVelocity = -100;
 
@@ -755,18 +757,6 @@ function NUKE_PARTICLE_ACTION(particle) {
   if (particle.actionIterations > 4) particles.makeParticleInactive(particle);
 }
 
-function SNAP_PARTICLE_INIT(particle) {
-  if (random() < 50) particle.setColor(DUST);
-  const maxDimension = Math.max(width, height);
-  particle.size = maxDimension / 8 + (Math.random() * maxDimension) / 16;
-}
-
-function SNAP_PARTICLE_ACTION(particle) {
-  particle.drawCircle(particle.size);
-
-  if (particle.actionIterations > 4) particles.makeParticleInactive(particle);
-}
-
 function HUMAN_PARTICLE_INIT(particle) {
   particle.setColor(HUMAN_MAKER);
   /* Make it harder for the angle to be steep */
@@ -784,6 +774,7 @@ function HUMAN_PARTICLE_INIT(particle) {
 }
 
 function HUMAN_PARTICLE_ACTION(particle) {
+  /* Clone of LAVA_PARTICLE. Used in human reproduction. */
   offscreenParticleCtx.beginPath();
   offscreenParticleCtx.lineWidth = particle.size;
   offscreenParticleCtx.strokeStyle = particle.rgbaColor;
@@ -807,19 +798,19 @@ function HUMAN_PARTICLE_ACTION(particle) {
   }
 
   /* possible extinguish due to water, lava, rock, ice, or wall */
-  if (random() < 100) {
+  if (random() < 99) {
     /* Need to update yVelocity before calling aboutToHit() */
     particle.yVelocity =
       particle.initYVelocity + particle.yAcceleration * iterations;
     const touchingColor = particle.aboutToHit();
 
     var replaceColor = -1;
-    if (random() < 5) {
+    if (random() < 25) {
       replaceColor = HUMAN;
     }
     if (touchingColor === LAVA || touchingColor === FIRE) {
       if (random() < 95) replaceColor = STEAM;
-    } else if (touchingColor === WALL || touchingColor === BEDROCK || touchingColor === PLANT || touchingColor === LEAF) {
+    } else if (touchingColor === WALL || touchingColor === BEDROCK || touchingColor === PLANT || touchingColor === LEAF || touchingColor === BRANCH || touchingColor === FUSE || touchingColor === ROCK || touchingColor === SOIL) {
       if (random() < 95) replaceColor = HUMAN;
     }
 
@@ -1035,6 +1026,8 @@ const PAINTABLE_PARTICLE_COLORS = {};
 
 const MAGIC_COLORS = [];
 
+const FIREWORK_COLORS = [];
+
 function initParticles() {
   if (__particleInit.length !== __particleActions.length)
     throw "Particle arrays must be same length";
@@ -1085,6 +1078,8 @@ function initParticles() {
   PAINTABLE_PARTICLE_COLORS[DUST] = null;
   PAINTABLE_PARTICLE_COLORS[HUMAN_MAKER] = null;
   PAINTABLE_PARTICLE_COLORS[HUMAN] = null;
+  PAINTABLE_PARTICLE_COLORS[BEDROCK] = null;
+  PAINTABLE_PARTICLE_COLORS[NANITES] = null;
   Object.freeze(PAINTABLE_PARTICLE_COLORS);
 
   /* All of these are also in PAINTABLE_PARTICLE_COLORS */
@@ -1094,7 +1089,14 @@ function initParticles() {
   MAGIC_COLORS.push(WELL);
   MAGIC_COLORS.push(WAX);
   MAGIC_COLORS.push(ICE);
+  MAGIC_COLORS.push(BEDROCK);
+  MAGIC_COLORS.push(NANITES);
   Object.freeze(MAGIC_COLORS);
+
+  FIREWORK_COLORS.push(FIRE);
+  FIREWORK_COLORS.push(FIRE_BLUE);
+  FIREWORK_COLORS.push(FIRE_BRIGHT);
+  Object.freeze(FIREWORK_COLORS);
 }
 
 function updateParticles() {

@@ -47,6 +47,14 @@ const gameImagedata32 = new Uint32Array(gameImagedata.data.buffer);
 const saveGameImagedata32 = new Uint32Array(gameImagedata32.length);
 var gamestateSaved = false;
 
+/* Storage for the undo save state. */
+const undoGameImagedata32 = new Uint32Array(gameImagedata32.length);
+var gamestateUndo = false;
+
+/* Storage for the ACTUAL undo save state. */
+const aUndoGameImagedata32 = new Uint32Array(gameImagedata32.length);
+var gamestateAUndo = false;
+
 /* Cached for performance */
 const MAX_X_IDX = width - 1;
 const MAX_Y_IDX = height - 1;
@@ -81,6 +89,8 @@ function init() {
   for (var i = 0; i < len; i++) {
     gameImagedata32[i] = BACKGROUND;
     saveGameImagedata32[i] = BACKGROUND;
+    undoGameImagedata32[i] = BACKGROUND;
+    aUndoGameImagedata32[i] = BACKGROUND;
   }
 
   /* Nice crisp pixels, regardless of pixel ratio */
@@ -180,6 +190,8 @@ function setGameCanvas(elem) {
 }
 
 function clearGameCanvas() {
+  aUndoSaveGameCanvas();
+  undoSaveGameCanvas();
   particles.inactivateAll();
   setGameCanvas(BACKGROUND);
 }
@@ -199,6 +211,28 @@ function saveGameCanvas() {
   gamestateSaved = true;
 }
 
+/*
+ * Save state for the undo function.
+ */
+function undoSaveGameCanvas() {
+  const iterEnd = MAX_IDX + 1;
+  for (var i = 0; i !== iterEnd; i++)
+    undoGameImagedata32[i] = gameImagedata32[i];
+
+  gamestateUndo = true;
+}
+
+/*
+ * Save state for the undo function that the game will actually revert to.
+ */
+function aUndoSaveGameCanvas() {
+  const iterEnd = MAX_IDX + 1;
+  for (var i = 0; i !== iterEnd; i++)
+    aUndoGameImagedata32[i] = undoGameImagedata32[i];
+
+  gamestateAUndo = true;
+}
+
 function loadGameCanvas() {
   if (!gamestateSaved) return;
 
@@ -207,6 +241,28 @@ function loadGameCanvas() {
   const iterEnd = MAX_IDX + 1;
   for (var i = 0; i !== iterEnd; i++)
     gameImagedata32[i] = saveGameImagedata32[i];
+}
+
+function undoLoadGameCanvas() {
+  if (!gamestateUndo) return;
+  if (!gamestateAUndo) return;
+
+  particles.inactivateAll();
+
+  const iterEnd = MAX_IDX + 1;
+  for (var i = 0; i !== iterEnd; i++)
+    gameImagedata32[i] = aUndoGameImagedata32[i]
+}
+
+/*The game saves an undo copy after every stroke, so if I used that copy then nothing would change. I had to have an extra save in order to keep that previous stroke at all times so that the undo could revert correctly.*/
+function aUndoLoadGameCanvas() {
+  if (!gamestateAUndo) return;
+
+  particles.inactivateAll();
+
+  const iterEnd = MAX_IDX + 1;
+  for (var i = 0; i !== iterEnd; i++)
+    undoGameImagedata32[i] = aUndoGameImagedata32[i];
 }
 
 /* Signal that we've updated a game frame to our FPS counter */

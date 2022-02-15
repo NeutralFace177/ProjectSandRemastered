@@ -131,6 +131,8 @@ const CLONE = __inGameColor(252, 154, 216);
 const ACID = __inGameColor(157, 240, 40);
 const THERMITE = __inGameColor(195, 140, 70);
 const BURNING_THERMITE = __inGameColor(255, 130, 130);
+const FACTORY = __inGameColor(143, 67, 51);
+const DEEPSAND = __inGameColor(54, 57, 89);
 
 /*
  * It would be nice to combine the elements and elementActions
@@ -191,7 +193,9 @@ const elements = new Uint32Array([
   CLONE,
   ACID,
   THERMITE,
-  BURNING_THERMITE
+  BURNING_THERMITE,
+  FACTORY,
+  DEEPSAND,
 ]);
 const elementActions = [
   BACKGROUND_ACTION,
@@ -245,6 +249,8 @@ const elementActions = [
   ACID_ACTION,
   THERMITE_ACTION,
   BURNING_THERMITE_ACTION,
+  FACTORY_ACTION,
+  DEEPSAND_ACTION,
 ];
 Object.freeze(elementActions);
 
@@ -310,7 +316,9 @@ function initElements() {
 
 function WALL_ACTION(x, y, i) { }
 
-function BEDROCK_ACTION(x, y, i) { }
+function BEDROCK_ACTION(x, y, i) {
+  /*I wanted a solid wall that was more resistant to destruction, so I made this.*/
+}
 
 function BACKGROUND_ACTION(x, y, i) {
   throw "As an optimization, we should never be invoking the action for the background";
@@ -332,7 +340,22 @@ function SAND_ACTION(x, y, i) {
   if (doGravity(x, y, i, true, 95)) return;
 }
 
+function DEEPSAND_ACTION(x, y, i) {
+  /* Abyssal sand, toughened by deep water pressure. Clone of SAND*/
+  if (y !== MAX_Y_IDX && uniformBelowAdjacent(x, y, i) !== DEEPSAND) {
+    if (doDensitySink(x, y, i, WATER, true, 50)) return;
+    if (doDensitySink(x, y, i, SALT_WATER, true, 50)) return;
+    if (doDensitySink(x, y, i, OIL, true, 25)) return;
+    if (doDensitySink(x, y, i, LAVA, true, 20)) return;
+    if (doDensitySink(x, y, i, ACID, true, 20)) return;
+    if (doDensitySink(x, y, i, SAND, true, 5)) return;
+  }
+
+  if (doGravity(x, y, i, true, 99)) return;
+}
+
 function SNOW_ACTION(x, y, i) {
+  /*SNOW mainly reuses code from ICE*/
 
   if (random() < 1) {
     if (bordering(x, y, i, WATER) !== -1) {
@@ -384,7 +407,7 @@ function SNOW_ACTION(x, y, i) {
       return;
     }
   }
-  if (doGravity(x, y, i, true, 50)) return;
+  if (doGravity(x, y, i, true, 65)) return;
 }
 
 function WATER_ACTION(x, y, i) {
@@ -539,6 +562,7 @@ function FIRE_ACTION(x, y, i) {
 }
 
 function FIRE_CURSE_ACTION(x, y, i) {
+  /*Not even WATER can put out the flame. Spreads to almost everything. Definitely not inspired by Terraria.*/
   /* water */
   if (random() < 80) {
     var waterLoc = bordering(x, y, i, WATER);
@@ -591,7 +615,9 @@ function FIRE_CURSE_ACTION(x, y, i) {
           borderingElemC === SALT_WATER ||
           borderingElemC === STEAM ||
           borderingElemC === LAVA ||
-          borderingElemC === BEDROCK
+          borderingElemC === ACID ||
+          borderingElemC === BEDROCK ||
+          borderingElemC === DEEPSAND
         ) {
           flameOut = true;
         } else {
@@ -626,6 +652,7 @@ function FIRE_CURSE_ACTION(x, y, i) {
 }
 
 function FIRE_BRIGHT_ACTION(x, y, i) {
+  /*A nerfed version of FIRE. It's only purpose is to be white and look pretty*/
   /* water */
   if (random() < 80) {
     var waterLoc = bordering(x, y, i, WATER);
@@ -633,40 +660,6 @@ function FIRE_BRIGHT_ACTION(x, y, i) {
     if (waterLoc !== -1) {
       gameImagedata32[waterLoc] = STEAM;
       gameImagedata32[i] = BACKGROUND;
-      return;
-    }
-  }
-
-  /* plant */
-  if (random() < 20) {
-    const plantLoc = borderingAdjacent(x, y, i, PLANT);
-    if (plantLoc !== -1) {
-      gameImagedata32[plantLoc] = FIRE_BRIGHT;
-      return;
-    }
-  }
-
-  /* wax */
-  if (random() < 1) {
-    const waxLoc = bordering(x, y, i, WAX);
-    if (waxLoc !== -1) {
-      const waxXY = fastItoXYBordering(x, y, i, waxLoc);
-      gameImagedata32[waxLoc] = FIRE_BRIGHT;
-      const fallLoc = below(
-        Math.max(y, waxXY[1]),
-        Math.max(i, waxLoc),
-        BACKGROUND
-      );
-      if (fallLoc !== -1) gameImagedata32[fallLoc] = FALLING_WAX;
-      return;
-    }
-  }
-
-  /* fuse */
-  if (random() < 80) {
-    const fuseLoc = borderingAdjacent(x, y, i, FUSE);
-    if (fuseLoc !== -1) {
-      gameImagedata32[fuseLoc] = FIRE_BRIGHT;
       return;
     }
   }
@@ -687,31 +680,13 @@ function FIRE_BRIGHT_ACTION(x, y, i) {
 
         const idx = idxBase + xIter;
         const borderingElem = gameImagedata32[idx];
-
-        if (borderingElem === FIRE_BRIGHT) continue;
-
-        if (
-          borderingElem === PLANT ||
-          borderingElem === FUSE ||
-          borderingElem === BRANCH ||
-          borderingElem === LEAF
-        ) {
-          flameOut = false;
-          break;
-        }
-
-        if (borderingElem === OIL && random() < 50) {
-          flameOut = false;
-          break;
-        }
       }
-
       if (!flameOut) break;
     }
 
-    /* check for wax separately, since fire doesn't burn wax at corners */
-    if (flameOut && bordering(x, y, i, WAX) !== -1)
-      flameOut = false;
+    /* check for background */
+    if (flameOut && bordering(x, y, i, BACKGROUND) !== -1)
+      flameOut = true;
 
     if (flameOut) {
       gameImagedata32[i] = BACKGROUND;
@@ -730,6 +705,7 @@ function FIRE_BRIGHT_ACTION(x, y, i) {
 }
 
 function FIRE_BLUE_ACTION(x, y, i) {
+  /*A nerfed version of FIRE. It's only purpose is to be blue and look pretty*/
   /* water */
   if (random() < 80) {
     var waterLoc = bordering(x, y, i, WATER);
@@ -737,40 +713,6 @@ function FIRE_BLUE_ACTION(x, y, i) {
     if (waterLoc !== -1) {
       gameImagedata32[waterLoc] = STEAM;
       gameImagedata32[i] = BACKGROUND;
-      return;
-    }
-  }
-
-  /* plant */
-  if (random() < 20) {
-    const plantLoc = borderingAdjacent(x, y, i, PLANT);
-    if (plantLoc !== -1) {
-      gameImagedata32[plantLoc] = FIRE_BLUE;
-      return;
-    }
-  }
-
-  /* wax */
-  if (random() < 1) {
-    const waxLoc = bordering(x, y, i, WAX);
-    if (waxLoc !== -1) {
-      const waxXY = fastItoXYBordering(x, y, i, waxLoc);
-      gameImagedata32[waxLoc] = FIRE_BLUE;
-      const fallLoc = below(
-        Math.max(y, waxXY[1]),
-        Math.max(i, waxLoc),
-        BACKGROUND
-      );
-      if (fallLoc !== -1) gameImagedata32[fallLoc] = FALLING_WAX;
-      return;
-    }
-  }
-
-  /* fuse */
-  if (random() < 80) {
-    const fuseLoc = borderingAdjacent(x, y, i, FUSE);
-    if (fuseLoc !== -1) {
-      gameImagedata32[fuseLoc] = FIRE_BLUE;
       return;
     }
   }
@@ -791,31 +733,13 @@ function FIRE_BLUE_ACTION(x, y, i) {
 
         const idx = idxBase + xIter;
         const borderingElem = gameImagedata32[idx];
-
-        if (borderingElem === FIRE_BLUE) continue;
-
-        if (
-          borderingElem === PLANT ||
-          borderingElem === FUSE ||
-          borderingElem === BRANCH ||
-          borderingElem === LEAF
-        ) {
-          flameOut = false;
-          break;
-        }
-
-        if (borderingElem === OIL && random() < 50) {
-          flameOut = false;
-          break;
-        }
       }
-
       if (!flameOut) break;
     }
 
-    /* check for wax separately, since fire doesn't burn wax at corners */
-    if (flameOut && bordering(x, y, i, WAX) !== -1)
-      flameOut = false;
+    /* check for background */
+    if (flameOut && bordering(x, y, i, BACKGROUND) !== -1)
+      flameOut = true;
 
     if (flameOut) {
       gameImagedata32[i] = BACKGROUND;
@@ -906,6 +830,7 @@ function GUNPOWDER_ACTION(x, y, i) {
 }
 
 function FIREWORK_ACTION(x, y, i) {
+  /*FIREWORK originally was going to be a clone of GUNPOWDER but with colored fire, but I decided to use the LAVA particle instead.*/
   if (random() < 35) {
     if ((bordering(x, y, i, FIRE) !== -1) || (bordering(x, y, i, FIRE_CURSE) !== -1)) {
       /* Chance to set off a star shaped explosion */
@@ -1126,10 +1051,12 @@ const __lava_immune = [
   WALL,
   ROCK,
   BEDROCK,
+  DEEPSAND,
   WATER,
   SALT_WATER,
   STEAM,
-  CORRUPT
+  CORRUPT,
+  FACTORY
 ];
 Object.freeze(__lava_immune);
 const __num_lava_immune = __lava_immune.length;
@@ -1257,13 +1184,6 @@ function ROCK_ACTION(x, y, i) {
     if (doDensitySink(x, y, i, LAVA, false, 20)) return;
   }
 
-  if (random() < 5) {
-    if (bordering(x, y, i, CORRUPT) !== -1) {
-      __doCorruption(x, y, i);
-      return;
-    }
-  }
-
   if (doGravity(x, y, i, false, 99)) return;
 
   /* Produce METHANE when in contact with OIL */
@@ -1346,6 +1266,7 @@ function CRYO_ACTION(x, y, i) {
 
       if (
         borderingElem === WALL ||
+        borderingElem === BEDROCK ||
         borderingElem === SPOUT ||
         borderingElem === WAX ||
         borderingElem === WELL ||
@@ -1390,7 +1311,7 @@ function CRYO_ACTION(x, y, i) {
 }
 
 function CORRUPT_ACTION(x, y, i) {
-  /*Destroys all life*/
+  /*Destroys all life. Definitely not inspired by Terraria. Uses the __doCorruption(); function.*/
   if (doGravity(x, y, i, true, 70)) return;
 }
 
@@ -1576,7 +1497,7 @@ function LEAF_ACTION(x, y, i) {
     }
   }
 
-  if (random() < 1 && random() < 9) doProducer(x, y, i, POLLEN, false, 100);
+  if (random() < 1 && random() < 3) doProducer(x, y, i, POLLEN, false, 100);
 }
 
 function POLLEN_ACTION(x, y, i) {
@@ -1647,12 +1568,15 @@ function ACID_ACTION(x, y, i) {
         const borderingElem = gameImagedata32[idx];
 
         if (borderingElem === ACID ||
-            borderingElem === BACKGROUND ||
-            borderingElem === WATER ||
-            borderingElem === SALT_WATER ||
-            borderingElem === ICE ||
-            borderingElem === CHILLED_ICE ||
-            borderingElem === CRYO)
+          borderingElem === BACKGROUND ||
+          borderingElem === BEDROCK ||
+          borderingElem === DEEPSAND ||
+          borderingElem === WATER ||
+          borderingElem === SALT_WATER ||
+          borderingElem === ICE ||
+          borderingElem === CHILLED_ICE ||
+          borderingElem === CRYO ||
+          borderingElem === FACTORY)
           continue;
 
         if (yIter !== y + 1) {
@@ -1679,7 +1603,7 @@ function THERMITE_ACTION(x, y, i) {
 
   /* Chance to turn into BURNING_THERMITE if near fire */
   if (random() < 50) {
-    if (borderingAdjacent(x, y, i, FIRE) !== -1) {
+    if ((borderingAdjacent(x, y, i, FIRE) !== -1) || (borderingAdjacent(x, y, i, FIRE_CURSE) !== -1)) {
       gameImagedata32[i] = BURNING_THERMITE;
       return;
     }
@@ -1704,9 +1628,9 @@ function BURNING_THERMITE_ACTION(x, y, i) {
 
     const elem = gameImagedata32[burnLoc];
     if (elem !== THERMITE &&
-        elem !== BURNING_THERMITE &&
-        elem !== LAVA &&
-        elem !== WALL) {
+      elem !== BURNING_THERMITE &&
+      elem !== LAVA &&
+      elem !== WALL) {
       gameImagedata32[burnLoc] = FIRE;
     }
   }
@@ -1750,7 +1674,9 @@ function BURNING_THERMITE_ACTION(x, y, i) {
 
 
 function HUMAN_ACTION(x, y, i) {
-  /*Finally, intelligent(?) life*/
+  /* Finally, intelligent(?) life. 
+   * Uses various functions I made, including moveRight(), moveLeft(), walkAround(), and moveAround(). 
+   * Not to mention all the other checks. This was HARD to get to work for just the movement alone.*/
 
   if (
     (adjacent(x, i, WALL) !== -1) ||
@@ -1812,21 +1738,38 @@ function HUMAN_ACTION(x, y, i) {
     slide = false;
   }
 
-  /*Bordering instances*/
+  /* Bordering instances.
+   * 
+   * Reproducing humans with the Reproduction element. */
   if (bordering(x, y, i, CLONE) !== -1) {
     if (random() < 5) {
-    particles.addActiveParticle(HUMAN_PARTICLE, x, y, i);
+      particles.addActiveParticle(HUMAN_PARTICLE, x, y, i);
     }
   }
+
   if (bordering(x, y, i, CORRUPT) !== -1) {
     __doCorruption(x, y, i);
     return;
+  }
+
+  /* I was having difficulties on trying to make the reproduction during Mating Season 
+   * low enough so that it didn't instantaneously hit the particle limit and severely limited it's coverage. 
+   * This ended up making it usable enough to cover a decent portion of the canvas. */
+  if (MS_ENABLED === true) {
+    var repro = Math.floor(Math.random() * 2);
+    var reproTwo = Math.floor(Math.random() * (repro + 1));
+    var reproThree = Math.floor(Math.random() * (reproTwo + 1));
+
+    if (random() < reproTwo) {
+      particles.addActiveParticle(HUMAN_PARTICLE, x, y, i);
+    }
   }
 
   if (doGravity(x, y, i, slide, 95)) return;
 }
 
 function HUMAN_MAKER_ACTION(x, y, i) {
+  /*A clone of fire, it's only used in human reproduction.*/
   if (random() < 50) {
     var flameOut = true;
 
@@ -1846,7 +1789,7 @@ function HUMAN_MAKER_ACTION(x, y, i) {
       if (!flameOut) break;
     }
 
-    /* check for wax separately, since fire doesn't burn wax at corners */
+    /* check for background */
     if (flameOut && bordering(x, y, i, BACKGROUND) !== -1)
       flameOut = true;
 
@@ -1860,19 +1803,50 @@ function HUMAN_MAKER_ACTION(x, y, i) {
 function THANOS_ACTION(x, y, i) {
   /* Inevitable */
   if ((borderingAdjacent(x, y, i, FIRE) !== -1) || (borderingAdjacent(x, y, i, FIRE_CURSE) !== -1)) {
-    particles.addActiveParticle(SNAP_PARTICLE, x, y, i);
-    gameImagedata32[i] = BACKGROUND;
+    for (var idx = MAX_IDX; idx !== 0; idx--) {
+      const currElem = gameImagedata32[idx];
+      if (currElem === FIRE) {
+        gameImagedata32[idx] = BACKGROUND;
+        continue;
+      } else if (currElem === FIRE_CURSE) {
+        gameImagedata32[idx] = BACKGROUND;
+        continue;
+      } else if (currElem === THANOS) {
+        gameImagedata32[idx] = BACKGROUND;
+        continue;
+      } else if (currElem === BACKGROUND) {
+        continue;
+      } else {
+        if (random() < 50) {
+          gameImagedata32[idx] = DUST;
+        }
+        continue;
+      }
+
+      const swapIdx = Math.floor(Math.random() * idx);
+      const swapElem = gameImagedata32[swapIdx];
+
+      if (swapElem === FIRE || swapElem === FIRE_CURSE || swapElem === THANOS || swapElem === BACKGROUND)
+        continue;
+
+      gameImagedata32[idx] = swapElem;
+      gameImagedata32[swapIdx] = currElem;
+    }
   }
   if (doGravity(x, y, i, true, 95)) return;
 }
 
 function DUST_ACTION(x, y, i) {
   /* Dust to dust, ashes to ashes */
+  if (random() < 1) {
+    gameImagedata32[i] = BACKGROUND;
+  }
+  
   if (doGravity(x, y, i, true, 85)) return;
 }
 
 function NANITES_ACTION(x, y, i) {
-  /* Clones from a surrounding surface */
+  /* Clones from a surrounding surface. Reuses FIRE code. */
   const xStart = Math.max(x - 1, 0);
   const yStart = Math.max(y - 1, 0);
   const xEnd = Math.min(x + 2, MAX_X_IDX + 1);
@@ -1902,7 +1876,7 @@ function NANITES_ACTION(x, y, i) {
 }
 
 function SPICE_ACTION(x, y, i) {
-  /*For when normal explosives don't have enough BOOM*/
+  /*For when normal explosives don't have enough BOOM!*/
   if ((borderingAdjacent(x, y, i, FIRE) !== -1) || (borderingAdjacent(x, y, i, FIRE_CURSE) !== -1)) {
     if (random() < 20) particles.addActiveParticle(NITRO_PARTICLE, x, y, i);
     if (random() < 15) particles.addActiveParticle(NAPALM_PARTICLE, x, y, i);
@@ -1919,6 +1893,7 @@ function SPICE_ACTION(x, y, i) {
 }
 
 function CLONE_ACTION(x, y, i) {
+  /*Also known as reproduction. Reuses code from FIRE.*/
   if (random() < 25) {
     var flameOut = true;
 
@@ -1938,13 +1913,22 @@ function CLONE_ACTION(x, y, i) {
       if (!flameOut) break;
     }
 
-    /* check for wax separately, since fire doesn't burn wax at corners */
+    /* check for background*/
     if (flameOut && bordering(x, y, i, BACKGROUND) !== -1)
       flameOut = true;
 
     if (flameOut) {
       gameImagedata32[i] = BACKGROUND;
       return;
+    }
+  }
+}
+
+function FACTORY_ACTION(x, y, i) {
+  /*Uses a secret spigot to spew out glorious elements.*/
+  if (random() < 20) {
+    if (borderingAdjacent(x, y, i, BACKGROUND) !== -1) {
+      doProducer(x, y, i, SPIGOT_ELEMENTS[4], true, 75);
     }
   }
 }
@@ -2215,6 +2199,7 @@ function doMoveAround(x, y, i, moveAdjacent, chance) {
   return false;
 }
 
+/*Moves an element left.*/
 function moveLeft(x, i, chance) {
   if (random() >= chance) return false;
 
@@ -2236,6 +2221,7 @@ function moveLeft(x, i, chance) {
   return false;
 }
 
+/*Moves an element right.*/
 function moveRight(x, i, chance) {
   if (random() >= chance) return false;
 
@@ -2257,6 +2243,7 @@ function moveRight(x, i, chance) {
   return false;
 }
 
+/*Used by HUMANs. Allows them to randomly move left, right, and stand around.*/
 function walkAround(x, i, chance) {
   if (random() >= chance) return false;
 
@@ -2367,6 +2354,7 @@ function __doBorderBurn(x, y, i) {
   gameImagedata32[i] = FIRE;
 }
 
+/*Shameless copy of __doBorderBurn. Fun fact, CORRUPT was my first element, and it was originally going to be a CRYO clone that would cool and harden LAVA.*/
 function __doCorruption(x, y, i) {
   if (y !== 0) gameImagedata32[i - width] = CORRUPT;
   if (y !== MAX_Y_IDX) gameImagedata32[i + width] = CORRUPT;
