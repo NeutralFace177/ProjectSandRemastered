@@ -16,23 +16,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 /* Configuration of the menu */
 const ELEMENT_MENU_ELEMENTS_PER_ROW = 10;
 const PEN_SIZES = [1, 2, 4, 8, 16, 32, 64, 128, 256];
 const PEN_SIZE_LABELS = ["0.5px", "1px", "2px", "4px", "8px", "16px", "32px", "64px", "128px"];
 const DEFAULT_PEN_IDX = 2;
-
 /* Elements listed in the menu */
 // prettier-ignore
 const elementMenuItems = [
-  WALL, SAND, WATER, PLANT, FIRE, SPOUT, WELL, SALT, OIL, WAX, 
-  TORCH, ICE, GUNPOWDER, NAPALM, NITRO, C4, LAVA, CRYO, FUSE, MYSTERY,
-  CONCRETE, METHANE, SOIL, ACID, THERMITE, BURNING_THERMITE, BACKGROUND, CHARGED_NITRO, BRANCH, LEAF, 
-  POLLEN, SALT_WATER, STEAM, FALLING_WAX, ROCK, WET_SOIL, CHILLED_ICE, CORRUPT, FIREWORK, BEDROCK, 
-  SNOW, FIRE_CURSE, HUMAN, NANITES, SPICE, CLONE, FACTORY, THANOS, DEEPSAND
+	WALL, CONCRETE, BEDROCK, SAND, DEEPSAND, SALT, WATER, SALT_WATER, STEAM, SNOW, 
+  ICE, CHILLED_ICE, CRYO, SOIL, WET_SOIL, PLANT, BRANCH, LEAF, POLLEN, CORRUPT, 
+  WAX, FALLING_WAX, FIRE, TORCH, FIRE_CURSE, LAVA, ROCK, OIL, METHANE, ACID, 
+  FUSE, GUNPOWDER, NAPALM, NITRO, CHARGED_NITRO, C4, REMOTE_C4, THERMITE, BURNING_THERMITE, FIREWORK, 
+  SPICE, SPOUT, WELL, FACTORY, HUMAN, CLONE, THANOS, MYSTERY, NANITES, VOID,
+  BACKGROUND,  
 ];
-
 const menuNames = {};
 menuNames[WALL] = "WALL";
 menuNames[BEDROCK] = "BEDROCK";
@@ -66,7 +64,7 @@ menuNames[FUSE] = "FUSE";
 menuNames[ICE] = "ICE";
 menuNames[CHILLED_ICE] = "CRYO ICE";
 menuNames[LAVA] = "LAVA";
-menuNames[ROCK] = "ROCK";
+menuNames[ROCK] = "LAVA ROCK";
 menuNames[METHANE] = "METHANE";
 menuNames[CRYO] = "CRYO";
 menuNames[CORRUPT] = "CORRUPT";
@@ -83,7 +81,8 @@ menuNames[SPICE] = "SPICE OF LIFE";
 menuNames[CLONE] = "REPRODUCTION";
 menuNames[FACTORY] = "PORTASPIGOT";
 menuNames[DEEPSAND] = "DEEPSAND";
-
+menuNames[REMOTE_C4] = "REMOTE C4";
+menuNames[VOID] = "VOID";
 /*
  * Some element colors do not have very good contrast against
  * the menu background. For these elements, we use a replacement
@@ -98,253 +97,251 @@ menuAltColors[SOIL] = "rgb(171, 110, 53)";
 menuAltColors[DEEPSAND] = "rgb(68, 72, 115)";
 
 function initMenu() {
-  /* The wrapper div that holds the entire menu */
-  const menu = document.getElementById("menuWrapper");
-
-  /* Set up the wrapper div that holds the element selectors */
-  const elementMenu = document.getElementById("elementTable");
-  elementMenu.style.width =
-    "50%"; /* force browser to scrunch the element menu */
-  const numRows = Math.ceil(
-    elementMenuItems.length / ELEMENT_MENU_ELEMENTS_PER_ROW
-  );
-  var elemIdx = 0;
-  var i, k;
-  for (i = 0; i < numRows; i++) {
-    const row = elementMenu.insertRow(i);
-    for (k = 0; k < ELEMENT_MENU_ELEMENTS_PER_ROW; k++) {
-      if (elemIdx >= elementMenuItems.length) break;
-
-      const cell = row.insertCell(k);
-      const elemButton = document.createElement("input");
-      cell.appendChild(elemButton);
-
-      elemButton.type = "button";
-      elemButton.className = "elementMenuButton";
-
-      const elemType = elementMenuItems[elemIdx];
-      if (!(elemType in menuNames))
-        throw "element is missing a canonical name: " + elemType;
-      elemButton.value = menuNames[elemType];
-
-      const elemColorRGBA = elemType;
-      elemButton.id = elemColorRGBA;
-
-      var elemMenuColor;
-      if (elemType in menuAltColors) elemMenuColor = menuAltColors[elemType];
-      else
-        elemMenuColor =
-          "rgb(" +
-          (elemColorRGBA & 0xff) +
-          ", " +
-          ((elemColorRGBA & 0xff00) >>> 8) +
-          ", " +
-          ((elemColorRGBA & 0xff0000) >>> 16) +
-          ")";
-      elemButton.style.color = elemMenuColor;
-
-      elemButton.addEventListener("click", function () {
-        document
-          .getElementById(SELECTED_ELEM.toString())
-          .classList.remove("selectedElementMenuButton");
-        elemButton.classList.add("selectedElementMenuButton");
-        SELECTED_ELEM = parseInt(elemButton.id, 10);
-      });
-
-      elemIdx++;
-    }
-  }
-  document.getElementById(SELECTED_ELEM.toString()).click();
-
-  /* Set up pensize options */
-  const pensizes = document.getElementById("pensize");
-  for (i = 0; i < PEN_SIZES.length; i++) {
-    const p = document.createElement("option");
-    p.value = PEN_SIZES[i];
-    p.text = PEN_SIZE_LABELS[i];
-    if (i === DEFAULT_PEN_IDX) {
-      p.selected = "selected";
-      PENSIZE = parseInt(p.value, 10);
-    }
-    pensizes.add(p);
-  }
-  pensizes.addEventListener("change", function () {
-    PENSIZE = parseInt(pensizes.value, 10);
-  });
-
-  /* Set up spigot size options */
-  /*The 5th spigot's size is actually unecessary, since FACTORY always operates at a fixed rate, but it's needed by the function since it runs a check for both a type and a size.*/
-  const spigotTypes = [
-    document.getElementById("spigot1Type"),
-    document.getElementById("spigot2Type"),
-    document.getElementById("spigot3Type"),
-    document.getElementById("spigot4Type"),
-    document.getElementById("spigot5Type"),
-  ];
-  const spigotSizes = [
-    document.getElementById("spigot1Size"),
-    document.getElementById("spigot2Size"),
-    document.getElementById("spigot3Size"),
-    document.getElementById("spigot4Size"),
-    document.getElementById("spigot5Size"),
-  ];
-  if (spigotTypes.length !== spigotSizes.length) throw "should be same length";
-  for (i = 0; i < spigotTypes.length; i++) {
-    const typeSelector = spigotTypes[i];
-    const sizeSelector = spigotSizes[i];
-    for (k = 0; k < SPIGOT_ELEMENT_OPTIONS.length; k++) {
-      const type = SPIGOT_ELEMENT_OPTIONS[k];
-      const option = document.createElement("option");
-      option.value = type;
-      option.text = menuNames[type];
-      if (i === k) {
-        option.selected = "selected";
-        SPIGOT_ELEMENTS[i] = type;
-      }
-      typeSelector.add(option);
-    }
-    for (k = 0; k < SPIGOT_SIZE_OPTIONS.length; k++) {
-      const size = SPIGOT_SIZE_OPTIONS[k];
-      const option = document.createElement("option");
-      option.value = size;
-      option.text = k.toString(10);
-      if (k === DEFAULT_SPIGOT_SIZE_IDX) {
-        option.selected = "selected";
-        SPIGOT_SIZES[i] = size;
-      }
-      sizeSelector.add(option);
-    }
-  }
-  spigotTypes[0].addEventListener("change", function () {
-    SPIGOT_ELEMENTS[0] = parseInt(spigotTypes[0].value, 10);
-  });
-  spigotTypes[1].addEventListener("change", function () {
-    SPIGOT_ELEMENTS[1] = parseInt(spigotTypes[1].value, 10);
-  });
-  spigotTypes[2].addEventListener("change", function () {
-    SPIGOT_ELEMENTS[2] = parseInt(spigotTypes[2].value, 10);
-  });
-  spigotTypes[3].addEventListener("change", function () {
-    SPIGOT_ELEMENTS[3] = parseInt(spigotTypes[3].value, 10);
-  });
-  spigotTypes[4].addEventListener("change", function () {
-    SPIGOT_ELEMENTS[4] = parseInt(spigotTypes[4].value, 10);
-  });
-  spigotSizes[0].addEventListener("change", function () {
-    SPIGOT_SIZES[0] = parseInt(spigotSizes[0].value, 10);
-  });
-  spigotSizes[1].addEventListener("change", function () {
-    SPIGOT_SIZES[1] = parseInt(spigotSizes[1].value, 10);
-  });
-  spigotSizes[2].addEventListener("change", function () {
-    SPIGOT_SIZES[2] = parseInt(spigotSizes[2].value, 10);
-  });
-  spigotSizes[3].addEventListener("change", function () {
-    SPIGOT_SIZES[3] = parseInt(spigotSizes[3].value, 10);
-  });
-  spigotSizes[4].addEventListener("change", function () {
-    SPIGOT_SIZES[4] = parseInt(spigotSizes[4].value, 10);
-  });
-
-  /* 'overwrite' checkbox */
-  const overwriteCheckbox = document.getElementById("overwriteCheckbox");
-  overwriteCheckbox.checked = OVERWRITE_ENABLED;
-  overwriteCheckbox.addEventListener("click", function () {
-    OVERWRITE_ENABLED = overwriteCheckbox.checked;
-  });
-
-  /* mating season checkbox*/
-  const seasonCheckbox = document.getElementById("seasonCheckbox");
-  seasonCheckbox.checked = MS_ENABLED;
-  seasonCheckbox.addEventListener("click", function () {
-    MS_ENABLED = seasonCheckbox.checked;
-  });
-
-  /* speed slider */
-  const speedSlider = document.getElementById("speedSlider");
-  speedSlider.min = 0;
-  speedSlider.max = MAX_FPS;
-  speedSlider.value = DEFAULT_FPS;
-  speedSlider.addEventListener("input", function () {
-    const val = parseInt(speedSlider.value, 10);
-    /* make 'magnetic' towards the default */
-    if (Math.abs(val - DEFAULT_FPS) < 10) speedSlider.value = DEFAULT_FPS;
-    setFPS(parseInt(speedSlider.value, 10));
-  });
-
-  /* clear button */
-  const clearButton = document.getElementById("clearButton");
-  clearButton.onclick = clearGameCanvas;
-
-  /* save button */
-  const saveButton = document.getElementById("saveButton");
-  saveButton.onclick = saveGameCanvas;
-
+	/* The wrapper div that holds the entire menu */
+	const menu = document.getElementById("menuWrapper");
+	/* Set up the wrapper div that holds the element selectors */
+	const elementMenu = document.getElementById("elementTable");
+	elementMenu.style.width = "50%"; /* force browser to scrunch the element menu */
+	const numRows = Math.ceil(elementMenuItems.length / ELEMENT_MENU_ELEMENTS_PER_ROW);
+	var elemIdx = 0;
+	var i, k;
+	for (i = 0; i < numRows; i++) {
+		const row = elementMenu.insertRow(i);
+		for (k = 0; k < ELEMENT_MENU_ELEMENTS_PER_ROW; k++) {
+			if (elemIdx >= elementMenuItems.length) break;
+			const cell = row.insertCell(k);
+			const elemButton = document.createElement("input");
+			cell.appendChild(elemButton);
+			elemButton.type = "button";
+			elemButton.className = "elementMenuButton";
+			const elemType = elementMenuItems[elemIdx];
+			if (!(elemType in menuNames)) throw "element is missing a canonical name: " + elemType;
+			elemButton.value = menuNames[elemType];
+			const elemColorRGBA = elemType;
+			elemButton.id = elemColorRGBA;
+			var elemMenuColor;
+			if (elemType in menuAltColors) elemMenuColor = menuAltColors[elemType];
+			else elemMenuColor = "rgb(" + (elemColorRGBA & 0xff) + ", " + ((elemColorRGBA & 0xff00) >>> 8) + ", " + ((elemColorRGBA & 0xff0000) >>> 16) + ")";
+			elemButton.style.color = elemMenuColor;
+			elemButton.addEventListener("click", function() {
+				document.getElementById(SELECTED_ELEM.toString()).classList.remove("selectedElementMenuButton");
+				elemButton.classList.add("selectedElementMenuButton");
+				SELECTED_ELEM = parseInt(elemButton.id, 10);
+			});
+			elemIdx++;
+		}
+	}
+	document.getElementById(SELECTED_ELEM.toString()).click();
+	/* Set up pensize options */
+	const pensizes = document.getElementById("pensize");
+	for (i = 0; i < PEN_SIZES.length; i++) {
+		const p = document.createElement("option");
+		p.value = PEN_SIZES[i];
+		p.text = PEN_SIZE_LABELS[i];
+		if (i === DEFAULT_PEN_IDX) {
+			p.selected = "selected";
+			PENSIZE = parseInt(p.value, 10);
+		}
+		pensizes.add(p);
+	}
+	pensizes.addEventListener("change", function() {
+		PENSIZE = parseInt(pensizes.value, 10);
+	});
+	/* Set up spigot size options */
+	/*The 5th spigot's size is actually unecessary, since FACTORY always operates at a fixed rate, but it's needed by the function since it runs a check for both a type and a size.*/
+	const spigotTypes = [
+		document.getElementById("spigot1Type"),
+		document.getElementById("spigot2Type"),
+		document.getElementById("spigot3Type"),
+		document.getElementById("spigot4Type"),
+		document.getElementById("spigot5Type"),
+	];
+	const spigotSizes = [
+		document.getElementById("spigot1Size"),
+		document.getElementById("spigot2Size"),
+		document.getElementById("spigot3Size"),
+		document.getElementById("spigot4Size"),
+		document.getElementById("spigot5Size"),
+	];
+	if (spigotTypes.length !== spigotSizes.length) throw "should be same length";
+	for (i = 0; i < spigotTypes.length; i++) {
+		const typeSelector = spigotTypes[i];
+		const sizeSelector = spigotSizes[i];
+		for (k = 0; k < SPIGOT_ELEMENT_OPTIONS.length; k++) {
+			const type = SPIGOT_ELEMENT_OPTIONS[k];
+			const option = document.createElement("option");
+			option.value = type;
+			option.text = menuNames[type];
+			if (i === k) {
+				option.selected = "selected";
+				SPIGOT_ELEMENTS[i] = type;
+			}
+			typeSelector.add(option);
+		}
+		for (k = 0; k < SPIGOT_SIZE_OPTIONS.length; k++) {
+			const size = SPIGOT_SIZE_OPTIONS[k];
+			const option = document.createElement("option");
+			option.value = size;
+			option.text = k.toString(10);
+			if (k === DEFAULT_SPIGOT_SIZE_IDX) {
+				option.selected = "selected";
+				SPIGOT_SIZES[i] = size;
+			}
+			sizeSelector.add(option);
+		}
+	}
+	spigotTypes[0].addEventListener("change", function() {
+		SPIGOT_ELEMENTS[0] = parseInt(spigotTypes[0].value, 10);
+	});
+	spigotTypes[1].addEventListener("change", function() {
+		SPIGOT_ELEMENTS[1] = parseInt(spigotTypes[1].value, 10);
+	});
+	spigotTypes[2].addEventListener("change", function() {
+		SPIGOT_ELEMENTS[2] = parseInt(spigotTypes[2].value, 10);
+	});
+	spigotTypes[3].addEventListener("change", function() {
+		SPIGOT_ELEMENTS[3] = parseInt(spigotTypes[3].value, 10);
+	});
+	spigotTypes[4].addEventListener("change", function() {
+		SPIGOT_ELEMENTS[4] = parseInt(spigotTypes[4].value, 10);
+	});
+	spigotSizes[0].addEventListener("change", function() {
+		SPIGOT_SIZES[0] = parseInt(spigotSizes[0].value, 10);
+	});
+	spigotSizes[1].addEventListener("change", function() {
+		SPIGOT_SIZES[1] = parseInt(spigotSizes[1].value, 10);
+	});
+	spigotSizes[2].addEventListener("change", function() {
+		SPIGOT_SIZES[2] = parseInt(spigotSizes[2].value, 10);
+	});
+	spigotSizes[3].addEventListener("change", function() {
+		SPIGOT_SIZES[3] = parseInt(spigotSizes[3].value, 10);
+	});
+	spigotSizes[4].addEventListener("change", function() {
+		SPIGOT_SIZES[4] = parseInt(spigotSizes[4].value, 10);
+	});
+	/* 'overwrite' checkbox */
+	const overwriteCheckbox = document.getElementById("overwriteCheckbox");
+	overwriteCheckbox.checked = OVERWRITE_ENABLED;
+	overwriteCheckbox.addEventListener("click", function() {
+		OVERWRITE_ENABLED = overwriteCheckbox.checked;
+	});
+	/* mating season checkbox*/
+	const seasonCheckbox = document.getElementById("seasonCheckbox");
+	seasonCheckbox.checked = MS_ENABLED;
+	seasonCheckbox.addEventListener("click", function() {
+		MS_ENABLED = seasonCheckbox.checked;
+	});
+	/* heat wave checkbox*/
+	const heatCheckbox = document.getElementById("heatCheckbox");
+	heatCheckbox.checked = HW_ENABLED;
+	heatCheckbox.addEventListener("click", function() {
+		HW_ENABLED = heatCheckbox.checked;
+	});
+	/* cold snap checkbox*/
+	const coldCheckbox = document.getElementById("coldCheckbox");
+	coldCheckbox.checked = CS_ENABLED;
+	coldCheckbox.addEventListener("click", function() {
+		CS_ENABLED = coldCheckbox.checked;
+	});
+	/* insta-ignite checkbox*/
+	const instaCheckbox = document.getElementById("instaCheckbox");
+	instaCheckbox.checked = II_ENABLED;
+	instaCheckbox.addEventListener("click", function() {
+		II_ENABLED = instaCheckbox.checked;
+	});
+	/* insta-ignite checkbox*/
+	const pollenCheckbox = document.getElementById("pollenCheckbox");
+	pollenCheckbox.checked = AP_ENABLED;
+	pollenCheckbox.addEventListener("click", function() {
+		AP_ENABLED = pollenCheckbox.checked;
+	});
+	/* speed slider */
+	const speedSlider = document.getElementById("speedSlider");
+	speedSlider.min = 0;
+	speedSlider.max = MAX_FPS;
+	speedSlider.value = DEFAULT_FPS;
+	speedSlider.addEventListener("input", function() {
+		const val = parseInt(speedSlider.value, 10);
+		/* make 'magnetic' towards the default */
+		if (Math.abs(val - DEFAULT_FPS) < 10) speedSlider.value = DEFAULT_FPS;
+		setFPS(parseInt(speedSlider.value, 10));
+	});
+	/* clear button */
+	const clearButton = document.getElementById("clearButton");
+	clearButton.onclick = clearGameCanvas;
+	/* save button */
+	const saveButton = document.getElementById("saveButton");
+	saveButton.onclick = saveGameCanvas;
+	/* load button */
+	const loadButton = document.getElementById("loadButton");
+	loadButton.onclick = loadGameCanvas;
   /* load button */
-  const loadButton = document.getElementById("loadButton");
-  loadButton.onclick = loadGameCanvas;
-
-   /*Menu keybinds*/
-  document.addEventListener('keydown', function(m) {
-    /*z - Undo*/
-    if (m.which === 17) {
-      undoLoadGameCanvas();
-      aUndoLoadGameCanvas();
-    }
-
-    /*s - Defaut FPS*/
-    if (m.which === 83) {
-      speedSlider.value = DEFAULT_FPS;
-      setFPS(parseInt(speedSlider.value, 10));
-    }
-    /*d - Max FPS*/
-    else if (m.which === 68) {
-      speedSlider.value = MAX_FPS;
-      setFPS(parseInt(speedSlider.value, 10));
-    }
-    /*a - Min/0 FPS*/
-    else if (m.which === 65) {
-      speedSlider.value = 0;
-      setFPS(parseInt(speedSlider.value, 10));
-    }
-
-    /*c - Clear Canvas*/
-    if (m.which === 67) {
-      clearGameCanvas();
-    }
-    /*z - Save Canvas*/
-    else if (m.which === 90) {
-      saveGameCanvas();
-    }
-    /*x - Load Canvas*/
-    else if (m.which === 88) {
-      loadGameCanvas();
-    }
-
-    /*Space Bar - Overwrite Checkbox*/
-    if (m.which === 32) {
-      if (overwriteCheckbox.checked !== false) {
-        overwriteCheckbox.checked = false;
-        OVERWRITE_ENABLED = false;
-      } else {
-        overwriteCheckbox.checked = true;
-        OVERWRITE_ENABLED = true;
-      } 
-    }
-
-    /*f - Mating Season (MS) Checkbox*/
-    if (m.which === 70) {
-      if (seasonCheckbox.checked !== true) {
-        seasonCheckbox.checked = true;
-        MS_ENABLED = true;
-      } else {
-        seasonCheckbox.checked = false;
-        MS_ENABLED = false;
-      } 
-    }
-  });
+	const fillButton = document.getElementById("fillButton");
+	fillButton.onclick = function() {
+    particles.inactivateAll();
+    setGameCanvas(SELECTED_ELEM);
+  }
+	/*Menu keybinds*/
+	document.addEventListener('keydown', function(m) {
+    /*/ - Test Button*/
+		if (m.which === 191) {
+			console.log(saveGameImagedata32);
+		}
+		/*z - Undo*/
+		if (m.which === 17) {
+			undoLoadGameCanvas();
+			aUndoLoadGameCanvas();
+		}
+		/*s - Defaut FPS*/
+		if (m.which === 83) {
+			speedSlider.value = DEFAULT_FPS;
+			setFPS(parseInt(speedSlider.value, 10));
+		}
+		/*d - Max FPS*/
+		else if (m.which === 68) {
+			speedSlider.value = MAX_FPS;
+			setFPS(parseInt(speedSlider.value, 10));
+		}
+		/*a - Min/0 FPS*/
+		else if (m.which === 65) {
+			speedSlider.value = 0;
+			setFPS(parseInt(speedSlider.value, 10));
+		}
+		/*f - Remote C4*/
+		if (m.which === 70) {
+			REMOTE_BOMB = true;
+		}
+		/*c - Clear Canvas*/
+		if (m.which === 67) {
+			clearGameCanvas();
+		}
+		/*z - Save Canvas*/
+		else if (m.which === 90) {
+			saveGameCanvas();
+		}
+		/*x - Load Canvas*/
+		else if (m.which === 88) {
+			loadGameCanvas();
+		}
+		/*Space Bar - Overwrite Checkbox*/
+		if (m.which === 32) {
+			if (overwriteCheckbox.checked !== false) {
+				overwriteCheckbox.checked = false;
+				OVERWRITE_ENABLED = false;
+			} else {
+				overwriteCheckbox.checked = true;
+				OVERWRITE_ENABLED = true;
+			}
+		}
+	});
+	document.addEventListener('keyup', function(m) {
+		if (m.which === 70) {
+			REMOTE_BOMB = false;
+		}
+	});
 }
 
 function drawFPSLabel(fps) {
-  document.getElementById("fps-counter").innerText = "FPS: " + fps;
+	document.getElementById("fps-counter").innerText = "FPS: " + fps;
 }

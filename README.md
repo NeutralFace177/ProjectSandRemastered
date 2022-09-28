@@ -5,7 +5,7 @@ AltruisticNut's Notes
 
 Hey, this is a fork of Josh Don's "Project Sand" but I added a lot of random things, including:
 
-+ Elements only accessible by interactions between two unique elements are now placeable.
++ Vanilla elements only accessible by interactions between two unique elements are now placeable.
 + Several elements I created myself, which are:
   + Corrupt
   + Firework
@@ -18,9 +18,9 @@ Hey, this is a fork of Josh Don's "Project Sand" but I added a lot of random thi
   + Reproduction
   + ... and more along the way!
 + Several UI changes and keybinds for some of the functions.
-+ Possibly countless bugs from my own codetti or from updating it from a originally year-old version
++ Customizable modifiers that completely change the way the canvas handles certain elements.
 
-IMPORTANT NOTE: This version can get a bit laggier than the original, due to the canvas size increase and my own code quality not up to snuff with Josh Don.
+*IMPORTANT NOTE: This version can get a bit laggier than the original, due to the canvas size increase, more chaotic elements/features, and admittedly my own code quality not up to snuff with Josh Don.*
 
 More information can be found in GNLIST.md. You can read the original README.md below.
 
@@ -29,7 +29,7 @@ Have fun and enjoy. Pull requests about suggestions, bugs, and optimizations app
 -AltruisticNut
 
 Original Overview
---------
+-----------------
 
 In the early to mid 2000s, there were a series of Java applet based games based around a falling sand mechanic - collectively known as "Falling Sand Games". One of the most popular versions was referred to as the "Hell of Sand Falling Game". The website [http://androdome.com/Sand/](http://androdome.com/Sand/) provides a relatively detailed history of these applets.
 

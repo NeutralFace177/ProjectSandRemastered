@@ -1,89 +1,105 @@
 <!DOCTYPE html>
-
 <html lang="en-US">
 
 <head>
-  <link rel="stylesheet" type="text/css" href="styles.css" media="screen" />
-  <title>Project Sand: Gone Nuts</title>
-  <meta name="keywords" content="sand, falling, game" />
-  <meta name="description" content="Project Sand: Gone Nuts - A modded version of Josh Don's Project Sand" />
-  <meta name="subject" content="Project Sand: Gone Nuts" />
-  <meta charset="UTF-8">
-  <meta name="google" content="notranslate">
-  <link rel="icon" href="assets/favicon.ico" type="image/x-icon" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+	<link rel="stylesheet" type="text/css" href="styles.css" media="screen" />
+	<title>Project Sand: Gone Nuts</title>
+	<meta name="keywords" content="sand, falling, game" />
+	<meta name="description" content="Project Sand: Gone Nuts - A modded version of Josh Don's Project Sand" />
+	<meta name="subject" content="Project Sand: Gone Nuts" />
+	<meta charset="UTF-8">
+	<meta name="google" content="notranslate">
+	<link rel="icon" href="assets/favicon.ico" type="image/x-icon" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 </head>
-
 <div class="wrapper" id="gameWrapper">
-  <div id="titleWrapper">
-    <h1 class="title">Project Sand: Gone Nuts</h1>
-    <div class="subheader">
-      <div class="column-left">
-        <a href="https://github.com/joshdon/ProjectSand" target="_blank">Source Code</a>
-      </div>
-      <div class="column-center">
-        - Creator: Josh Don - Modder: AltruisticNut -
-      </div>
-      <div class="column-right">
-        <a href="https://github.com/AltruisticNut/Project-Sand-Gone-Nuts" target="_blank">Fork Code</a>
-      </div>
-    </div>
-  </div>
-
-  <canvas id="mainCanvas">Your browser doesn't support HTML5 canvas.</canvas>
-  <div id="menuWrapper">
-    <table id="elementTable">
-    </table>
-    <div id="optionsCol1" class="optionsCol">
-      <div id="penSizeDiv">
-        <label for="pensize">Pen Size</label>
-        <select id="pensize" class="penSizeAmount"></select>
-      </div>
-      <div>
-        <select id="spigot1Type" class="spigotType"></select>
-        <select id="spigot1Size" class="spigotAmount"></select>
-      </div>
-      <div>
-        <select id="spigot2Type" class="spigotType"></select>
-        <select id="spigot2Size" class="spigotAmount"></select>
-      </div>
-      <div>
-        <select id="spigot3Type" class="spigotType"></select>
-        <select id="spigot3Size" class="spigotAmount"></select>
-      </div>
-      <div>
-        <select id="spigot4Type" class="spigotType"></select>
-        <select id="spigot4Size" class="spigotAmount"></select>
-      </div>
-      <div>
-        <select id="spigot5Type" class="portaspigotType"></select>
-        <select id="spigot5Size" class="spigotAmount" style="display: none;"></select>
-      </div>
-    </div>
-    <div id="optionsCol2" class="optionsCol">
-      <div class="overwriteCol">
-        <label for="overwriteCheckbox">Overwrite</label>
-        <input type="checkbox" id="overwriteCheckbox">
-        <label for="seasonCheckbox">MS</label>
-        <input type="checkbox" id="seasonCheckbox">
-      </div>
-      <div id="speedSliderDiv">
-        <label for="speedSlider">Speed</label>
-        <input type="range" id="speedSlider">
-      </div>
-      <div class="optionButtonContainer">
-        <input id="saveButton" class="optionButton" type="button" value="Save">
-        <input id="loadButton" class="optionButton" type="button" value="Load">
-        <input id="clearButton" class="optionButton" type="button" value="Clear">
-      </div>
-      <div class ="noteContainer">
-        <p>Everything about the fork's features</p>
-        <p> can be found here on this <a href="GNLIST.md" target="_blank">document</a>.</p>
-      </div>
-    </div>
-    <div id="fps-counter">
-    </div>
-  </div>
+	<div id="titleWrapper">
+		<h1 class="title">Project Sand: Gone Nuts</h1>
+		<div class="subheader">
+			<div class="column-left">
+				<a href="https://github.com/joshdon/ProjectSand" target="_blank">Source Code</a>
+			</div>
+			<div class="column-center"> - Creator: Josh Don - Modder: AltruisticNut - </div>
+			<div class="column-right">
+				<a href="https://github.com/AltruisticNut/Project-Sand-Gone-Nuts" target="_blank">Fork Code</a>
+			</div>
+		</div>
+	</div>
+	<div style="display: flex; position: absolute;">
+		<div>
+			<canvas id="mainCanvas">Your browser doesn't support HTML5 canvas.</canvas>
+			<div id="menuWrapper">
+				<table id="elementTable">
+				</table>
+				<div id="optionsCol1" class="optionsCol">
+					<div id="penSizeDiv">
+						<label for="pensize">Pen Size</label>
+						<select id="pensize" class="penSizeAmount"></select>
+					</div>
+					<div>
+						<select id="spigot1Type" class="spigotType"></select>
+						<select id="spigot1Size" class="spigotAmount"></select>
+					</div>
+					<div>
+						<select id="spigot2Type" class="spigotType"></select>
+						<select id="spigot2Size" class="spigotAmount"></select>
+					</div>
+					<div>
+						<select id="spigot3Type" class="spigotType"></select>
+						<select id="spigot3Size" class="spigotAmount"></select>
+					</div>
+					<div>
+						<select id="spigot4Type" class="spigotType"></select>
+						<select id="spigot4Size" class="spigotAmount"></select>
+					</div>
+					<div>
+						<select id="spigot5Type" class="portaspigotType"></select>
+						<select id="spigot5Size" class="spigotAmount" style="display: none;"></select>
+					</div>
+				</div>
+				<div id="optionsCol2" class="optionsCol">
+					<div class="overwriteCol">
+						<label for="overwriteCheckbox">Overwrite</label>
+						<input type="checkbox" id="overwriteCheckbox">
+					</div>
+					<div id="speedSliderDiv">
+						<label for="speedSlider">Speed</label>
+						<input type="range" id="speedSlider">
+					</div>
+					<div class="optionButtonContainer">
+						<input id="saveButton" class="optionButton" type="button" value="Save">
+						<input id="loadButton" class="optionButton" type="button" value="Load">
+						<input id="clearButton" class="optionButton" type="button" value="Clear">
+					</div>
+					<div class="noteContainer">
+						<p>Everything about the fork's features</p>
+						<p> can be found here on this <a href="GNLIST.md" target="_blank">document</a>.</p>
+					</div>
+				</div>
+				<div id="fps-counter">
+				</div>
+			</div>
+		</div>
+		<div id="sideWrapper">
+			<p>GAME MODIFIERS:</p>
+			<label for="seasonCheckbox">Mating Season</label>
+			<input type="checkbox" id="seasonCheckbox">
+			<br>
+			<label for="heatCheckbox">Heat Wave</label>
+			<input type="checkbox" id="heatCheckbox">
+			<br>
+			<label for="coldCheckbox">Cold Snap</label>
+			<input type="checkbox" id="coldCheckbox">
+			<br>
+			<label for="instaCheckbox">Insta-Ignite</label>
+			<input type="checkbox" id="instaCheckbox">
+			<br>
+			<label for="pollenCheckbox">Anti-Pollen</label>
+			<input type="checkbox" id="pollenCheckbox">
+      <br>
+      <input style="margin-left: 17px; margin-top: 5px; margin-bottom: 5px;" id="fillButton" class="optionButton" type="button" value="Fill Canvas">
+		</div>
+	</div>
 </div>
 
 <script type="text/javascript" src="scripts/util.js"></script>
