@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 /* Configuration of the menu */
-const ELEMENT_MENU_ELEMENTS_PER_ROW = 10;
+const ELEMENT_MENU_ELEMENTS_PER_ROW = 7;
 const PEN_SIZES = [1, 2, 4, 8, 16, 32, 64, 128, 256];
 const PEN_SIZE_LABELS = ["0.5px", "1px", "2px", "4px", "8px", "16px", "32px", "64px", "128px"];
 const DEFAULT_PEN_IDX = 2;
