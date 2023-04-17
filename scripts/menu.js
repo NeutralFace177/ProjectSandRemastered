@@ -104,7 +104,8 @@ menuAltColors[BACKGROUND] = "rgb(200, 100, 200)";
 menuAltColors[WELL] = "rgb(158, 13, 33)";
 menuAltColors[SOIL] = "rgb(171, 110, 53)";
 menuAltColors[DEEPSAND] = "rgb(68, 72, 115)";
-menuAltColors[MUSHROOM_DIRT_WET] = "rgb(90, 75, 100)"
+menuAltColors[MUSHROOM_DIRT_WET] = "rgb(172, 39, 161)";
+menuAltColors[MUSHROOM_DIRT] = "rgb(172, 39, 141)";
 
 function initMenu() {
 	/* The wrapper div that holds the entire menu */
