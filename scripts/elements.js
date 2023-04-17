@@ -134,6 +134,7 @@ const MUSHROOM_STEM = __inGameColor(255, 208, 244);
 const MUSHROOM_TOP = __inGameColor(255, 54, 107);
 const MUSHROOM_DIRT = __inGameColor(94, 75, 110);
 const MUSHROOM_DIRT_WET = __inGameColor(54, 35, 70);
+const BLOOD = inGameColor(140, 13, 13);
 /*
  * It would be nice to combine the elements and elementActions
  * into a single 2d array, but to optimize for speed we need
@@ -203,6 +204,7 @@ const elements = new Uint32Array([
 	MUSHROOM_TOP,
 	MUSHROOM_DIRT,
 	MUSHROOM_DIRT_WET,
+	BLOOD,
 ]);
 
 
@@ -268,6 +270,7 @@ const elementActions = [
 	MUSHROOM_TOP_ACTION,
 	MUSHROOM_DIRT_ACTION,
 	MUSHROOM_DIRT_WET_ACTION,
+	BLOOD_ACTION,
 ];
 Object.freeze(elementActions);
 const GAS_PERMEABLE = {};
@@ -313,9 +316,13 @@ function initElements() {
 	GAS_PERMEABLE[HUMAN] = null;
 	GAS_PERMEABLE[THANOS] = null;
 	GAS_PERMEABLE[ACID] = null;
+	GAS_PERMEABLE[BLOOD] = null;
 	Object.freeze(GAS_PERMEABLE);
 }
 /* ======================= Element action handlers ======================= */
+function BLOOD_FUNCTION(x,y,i) {
+//does nothing rn	
+}
 function WALL_ACTION(x, y, i) {}
 
 function BEDROCK_ACTION(x, y, i) {
