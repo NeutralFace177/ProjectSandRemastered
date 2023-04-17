@@ -28,7 +28,7 @@ const elementMenuItems = [
   ICE, CHILLED_ICE, CRYO, SOIL, WET_SOIL, PLANT, BRANCH, LEAF, POLLEN, CORRUPT, 
   WAX, FALLING_WAX, FIRE, TORCH, FIRE_CURSE, LAVA, ROCK, OIL, METHANE, ACID, 
   FUSE, GUNPOWDER, NAPALM, NITRO, CHARGED_NITRO, C4, REMOTE_C4, THERMITE, BURNING_THERMITE, FIREWORK, 
-  SPICE, SPOUT, WELL, FACTORY, HUMAN, CLONE, THANOS, MYSTERY, NANITES, VOID,
+  SPICE, SPOUT, WELL, FACTORY, HUMAN, CLONE, THANOS, MYSTERY, NANITES, VOID, MUSHROOM_DIRT, MUSHROOM_DIRT_WET, MUSHROOM_STEM, MUSHROOM_TOP,
   BACKGROUND,  
 ];
 const menuNames = {};
@@ -83,6 +83,15 @@ menuNames[FACTORY] = "PORTASPIGOT";
 menuNames[DEEPSAND] = "DEEPSAND";
 menuNames[REMOTE_C4] = "REMOTE C4";
 menuNames[VOID] = "VOID";
+menuNames[MUSHROOM_DIRT] = "Mycelium";
+menuNames[MUSHROOM_DIRT_WET] = "Wet Mycelium";
+menuNames[MUSHROOM_STEM] = "Mushroom Stem";
+menuNames[MUSHROOM_TOP] = "Mushroom Top";
+
+
+
+
+
 /*
  * Some element colors do not have very good contrast against
  * the menu background. For these elements, we use a replacement
@@ -95,6 +104,7 @@ menuAltColors[BACKGROUND] = "rgb(200, 100, 200)";
 menuAltColors[WELL] = "rgb(158, 13, 33)";
 menuAltColors[SOIL] = "rgb(171, 110, 53)";
 menuAltColors[DEEPSAND] = "rgb(68, 72, 115)";
+menuAltColors[MUSHROOM_DIRT_WET] = "rgb(90, 75, 100)"
 
 function initMenu() {
 	/* The wrapper div that holds the entire menu */
@@ -237,12 +247,14 @@ function initMenu() {
 	heatCheckbox.checked = HW_ENABLED;
 	heatCheckbox.addEventListener("click", function() {
 		HW_ENABLED = heatCheckbox.checked;
+
 	});
 	/* cold snap checkbox*/
 	const coldCheckbox = document.getElementById("coldCheckbox");
 	coldCheckbox.checked = CS_ENABLED;
 	coldCheckbox.addEventListener("click", function() {
 		CS_ENABLED = coldCheckbox.checked;
+
 	});
 	/* insta-ignite checkbox*/
 	const instaCheckbox = document.getElementById("instaCheckbox");

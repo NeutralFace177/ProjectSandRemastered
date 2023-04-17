@@ -129,6 +129,11 @@ const FACTORY = __inGameColor(143, 67, 51);
 const DEEPSAND = __inGameColor(54, 57, 89);
 const REMOTE_C4 = __inGameColor(227, 211, 86);
 const VOID = __inGameColor(40, 34, 48);
+const ZOMBIE = __inGameColor(101, 121, 75);
+const MUSHROOM_STEM = __inGameColor(255, 208, 244);
+const MUSHROOM_TOP = __inGameColor(255, 54, 107);
+const MUSHROOM_DIRT = __inGameColor(94, 75, 110);
+const MUSHROOM_DIRT_WET = __inGameColor(54, 35, 70);
 /*
  * It would be nice to combine the elements and elementActions
  * into a single 2d array, but to optimize for speed we need
@@ -192,8 +197,16 @@ const elements = new Uint32Array([
 	FACTORY,
 	DEEPSAND,
 	REMOTE_C4,
-  VOID,
+  	VOID,
+	ZOMBIE,
+	MUSHROOM_STEM,
+	MUSHROOM_TOP,
+	MUSHROOM_DIRT,
+	MUSHROOM_DIRT_WET,
 ]);
+
+
+
 const elementActions = [
 	BACKGROUND_ACTION,
 	WALL_ACTION,
@@ -249,14 +262,19 @@ const elementActions = [
 	FACTORY_ACTION,
 	DEEPSAND_ACTION,
 	REMOTE_C4_ACTION,
-  VOID_ACTION,
+  	VOID_ACTION,
+	ZOMBIE_ACTION,
+	MUSHROOM_STEM_ACTION,
+	MUSHROOM_TOP_ACTION,
+	MUSHROOM_DIRT_ACTION,
+	MUSHROOM_DIRT_WET_ACTION,
 ];
 Object.freeze(elementActions);
 const GAS_PERMEABLE = {};
 const NUM_ELEMENTS = elements.length;
 
 function initElements() {
-	if (NUM_ELEMENTS > 64) throw "too many elements (we only use 6 bits for element index)";
+	//if (NUM_ELEMENTS > 64) throw "too many elements (we only use 6 bits for element index)";
 	if (NUM_ELEMENTS !== elementActions.length) throw "need 1 action per element";
 	const colors = {};
 	for (var i = 0; i < elements.length; i++) {
@@ -1075,6 +1093,9 @@ const __mysteryElements = [
   THANOS,
   NANITES,
   VOID,
+  MUSHROOM_DIRT,
+  MUSHROOM_STEM,
+  MUSHROOM_TOP,
 ];
 Object.freeze(__mysteryElements);
 
@@ -1222,6 +1243,88 @@ function LEAF_ACTION(x, y, i) {
 function POLLEN_ACTION(x, y, i) {
 	if (__doCorruption(x, y, i)) return;
 	if (doGravity(x, y, i, true, 95)) return;
+}
+
+
+function MUSHROOM_DIRT_ACTION(x, y, i) {
+	if (doGravity(x, y, i, false, 99)) return;
+	if (__doCorruption(x, y, i)) return;
+	/* Optimize for common case; can't sink through SOIL */
+	if (y !== MAX_Y_IDX && uniformBelowAdjacent(x, y, i) !== MUSHROOM_DIRT) {
+		if (doDensitySink(x, y, i, WATER, true, 50)) return;
+		if (doDensitySink(x, y, i, SALT_WATER, true, 50)) return;
+		if (doDensitySink(x, y, i, POLLEN, true, 50)) return;
+	}
+	
+	if (random() < 15) {
+		const waterLoc = aboveAdjacent(x, y, i, WATER);
+		if (waterLoc !== -1) {
+			gameImagedata32[waterLoc] = BACKGROUND;
+			gameImagedata32[i] = MUSHROOM_DIRT_WET;
+			return;
+		}
+	}
+	
+}
+function MUSHROOM_DIRT_WET_ACTION(x, y, i) {
+	if (random() < 15) {
+		const waterLoc = aboveAdjacent(x, y, i, WATER);
+		if (waterLoc !== -1) {
+			gameImagedata32[waterLoc] = BACKGROUND;
+		}
+	}
+	if (__doCorruption(x, y, i)) return;
+	if (doGravity(x, y, i, false, 99)) return;
+	if (doDensitySink(x, y, i, WATER, true, 50)) return;
+	if (doDensitySink(x, y, i, SALT_WATER, true, 50)) return;
+	if (random() < 5) {
+		if (random() < 97) {
+			if (borderingAdjacent(x, y, i, WATER) === -1) gameImagedata32[i] = MUSHROOM_DIRT_WET;
+			return;
+		}
+		/* make tree generation less likely */
+		
+		if (true) {
+			if (particles.addActiveParticle(TREE_PARTICLE, x, y, i)) {
+				gameImagedata32[i] = MUSHROOM_DIRT;
+			}
+		}
+	}
+}
+
+
+function MUSHROOM_STEM_ACTION(x,y,i) {
+	doGrow(x, y, i, CLONE, 5);
+	if (random() < 5) {
+		if (borderingAdjacent(x, y, i, FIRE) !== -1) {
+			gameImagedata32[i] = FIRE;
+		}
+	}
+	if (__doCorruption(x, y, i)) return;
+	if (random() < 20) {
+		const saltLoc = borderingAdjacent(x, y, i, SALT);
+		if (saltLoc !== -1) {
+			gameImagedata32[i] = BACKGROUND;
+			return;
+		}
+	}
+}
+
+function MUSHROOM_TOP_ACTION(x,y,i) {
+	doGrow(x, y, i, CLONE, 5);
+	if (random() < 5) {
+		if (borderingAdjacent(x, y, i, FIRE) !== -1) {
+			gameImagedata32[i] = FIRE;
+		}
+	}
+	if (__doCorruption(x, y, i)) return;
+	if (random() < 20) {
+		const saltLoc = borderingAdjacent(x, y, i, SALT);
+		if (saltLoc !== -1) {
+			gameImagedata32[i] = BACKGROUND;
+			return;
+		}
+	}
 }
 
 function CHARGED_NITRO_ACTION(x, y, i) {
@@ -1388,6 +1491,50 @@ function HUMAN_ACTION(x, y, i) {
 			particles.addActiveParticle(HUMAN_PARTICLE, x, y, i);
 		}
 	}
+  if (__doCorruption(x, y, i)) return;
+  //if (random() < 95) {
+    //walkAround(x, i, 75);
+  //}
+  //doGravity(x, y, i, false, 95);
+  return;
+}
+
+function ZOMBIE_ACTION(x, y, i) {
+	/* Finally, intelligent(?) life. 
+	 * Uses various functions I made, including moveRight(), moveLeft(), and walkAround(). 
+	 * Not to mention all the other checks. This was HARD to get to work for just the movement alone.
+   */
+  if (random() < 90) {
+      if ((above(y, i, BACKGROUND) === -1) && (above(y, i, ZOMBIE) === -1)) {
+    		walkAround(x, i, 40);
+        doGravity(x, y, i, true, 1);
+        return;
+    	}
+    	if ((adjacentRight(x, i, BACKGROUND) === -1) && (adjacentRight(x, i, ZOMBIE) === -1)) {
+    		moveUp(y, i, 60);
+    		moveRight(x, i, 75);
+        return;
+      }
+    	if ((adjacentLeft(x, i, BACKGROUND) === -1) && (adjacentLeft(x, i, ZOMBIE) === -1)) {
+    		moveUp(y, i, 60);
+    		moveLeft(x, i, 75);
+        return;
+    	}
+      if ((above(y, i, BACKGROUND) !== -1) || (above(y, i, ZOMBIE) !== -1)) {
+    		walkAround(x, i, 75);
+    		doGravity(x, y, i, false, 95);
+        return;
+    	}
+    if (bordering(x, y, i, CLONE) !== -1) {
+		  if (random() < 5) {
+			  particles.addActiveParticle(ZOMBIE_PARTICLE, x, y, i);
+		  }
+	  }
+  }
+	/* I was having difficulties on trying to make the reproduction during Mating Season 
+	 * low enough so that it didn't instantaneously hit the particle limit and severely limited it's coverage. 
+	 * This ended up making it usable enough to cover a decent portion of the canvas. */
+	
   if (__doCorruption(x, y, i)) return;
   //if (random() < 95) {
     //walkAround(x, i, 75);

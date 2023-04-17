@@ -1,5 +1,5 @@
 /*
- * Global game parameters for the primary canvas.
+* Global game parameters for the primary canvas.
  *
  * Copyright (C) 2020, Josh Don
  *
@@ -21,6 +21,6 @@ const __max_height = 500;
 /* Need to use a smaller size when on mobile devices with small screens */
 const width = Math.min(__max_width, Math.max(screen.width - 6, 1));
 const height = Math.min(__max_height, Math.max(screen.height - 380, 200));
-const MAX_FPS = 120;
+const MAX_FPS = 240;
 const DEFAULT_FPS = 60;
 const MAX_NUM_PARTICLES = 750;

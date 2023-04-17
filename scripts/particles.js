@@ -56,6 +56,7 @@ const FIREWORK_PARTICLE = 11;
 const CURSEWORK_PARTICLE = 12;
 const CHARGED_CURSE_PARTICLE = 13;
 const HUMAN_PARTICLE = 14;
+const MUSHROOM_PARTICLE = 15;
 const __particleInit = [
 	UNKNOWN_PARTICLE_INIT,
 	NITRO_PARTICLE_INIT,
@@ -71,7 +72,8 @@ const __particleInit = [
 	FIREWORK_PARTICLE_INIT,
 	CURSEWORK_PARTICLE_INIT,
 	CHARGED_CURSE_PARTICLE_INIT,
-	HUMAN_PARTICLE_INIT
+	HUMAN_PARTICLE_INIT,
+	MUSHROOM_PARTICLE_INIT
 ];
 Object.freeze(__particleInit);
 const __particleActions = [
@@ -89,7 +91,8 @@ const __particleActions = [
 	FIREWORK_PARTICLE_ACTION,
 	CURSEWORK_PARTICLE_ACTION,
 	CHARGED_CURSE_PARTICLE_ACTION,
-	HUMAN_PARTICLE_ACTION
+	HUMAN_PARTICLE_ACTION,
+	MUSHROOM_PARTICLE_ACTION
 ];
 Object.freeze(__particleActions);
 
@@ -535,6 +538,143 @@ function TREE_PARTICLE_ACTION(particle) {
 			b.treeType = particle.treeType;
 			treeInfo.initTreeParticle(b, particle);
 			if (leafBranch) b.setColor(LEAF);
+		}
+		if (particle.branches >= particle.maxBranches) {
+			particles.makeParticleInactive(particle);
+			return;
+		}
+		if (particle.branchSpacing > 45) particle.branchSpacing *= 0.8;
+		particle.nextBranch = iterations + particle.branchSpacing * (Math.random() * 0.35 + 0.65);
+	}
+}
+
+class MushroomType {
+	constructor() {
+		throw "Should never actually instantiate this.";
+	}
+	/** @nocollapse */
+	static initMushroomParticle(p, oldP) {}
+	/** @nocollapse */
+	static branchAngles(mushroomParticle) {
+		throw "Branch angles not implemented.";
+	}
+	/** @nocollapse */
+	static branchSpacingFactor(mushroomParticle) {
+		throw "Branch spacing factor not implemented.";
+	}
+}
+
+/* Standard mushroom */
+class Mushroom0 extends MushroomType {
+	/** @nocollapse */
+	static branchAngles(mushroomParticle) {
+		const branchAngle = EIGHTH_PI + Math.random() * QUARTER_PI;
+		return [mushroomParticle.angle + branchAngle, mushroomParticle.angle - branchAngle];
+	}
+	/** @nocollapse */
+	static branchSpacingFactor(mushroomParticle) {
+		return 0.9;
+	}
+}
+/* Single branch */
+class Mushroom1 extends MushroomType {
+	/** @nocollapse */
+	static initMushroomParticle(p, oldP) {
+		const branchDirection = oldP ? oldP.branchDirection : random() < 50 ? 1 : -1;
+		p.branchDirection = branchDirection;
+	}
+	/** @nocollapse */
+	static branchAngles(mushroomParticle) {
+		const branchAngle = (EIGHTH_PI + Math.random() * EIGHTH_PI) * mushroomParticle.branchDirection;
+		return [mushroomParticle.angle + branchAngle, mushroomParticle.angle];
+	}
+	/** @nocollapse */
+	static branchSpacingFactor(mushroomParticle) {
+		return 0.7;
+	}
+}
+/* Lots of shallow angle branching */
+class Mushroom2 extends MushroomType {
+	/** @nocollapse */
+	static branchAngles(mushroomParticle) {
+		const branchAngle = Math.random() * SIXTEENTH_PI + EIGHTH_PI;
+		return [
+			mushroomParticle.angle,
+			mushroomParticle.angle + branchAngle,
+			mushroomParticle.angle - branchAngle,
+		];
+	}
+	/** @nocollapse */
+	static branchSpacingFactor(mushroomParticle) {
+		return 0.6;
+	}
+}
+const MUSHROOM_TYPES = [
+	Mushroom0,
+	/* A little too cluttered to include Tree1 */
+	/* Tree1, */
+	Mushroom1,
+	Mushroom2,
+];
+const NUM_MUSHROOM_TYPES = MUSHROOM_TYPES.length;
+
+function MUSHROOM_PARTICLE_INIT(particle) {
+	particle.setColor(MUSHROOM_STEM);
+	particle.size = random() < 50 ? 3 : 4;
+	const velocity = 1 + Math.random() * 0.5;
+	const angle = -1 * (HALF_PI + EIGHTH_PI - Math.random() * QUARTER_PI);
+	particle.setVelocity(velocity, angle);
+	particle.generation = 1;
+	particle.branchSpacing = 15 + Math.round(Math.random() * 45);
+	particle.maxBranches = 1 + Math.round(Math.random() * 2);
+	particle.nextBranch = particle.branchSpacing;
+	particle.branches = 0;
+	/* make it more likely to be a standard tree */
+	
+	if (random() < 62) {
+		particle.mushroomType = 0;
+	} else {
+		particle.mushroomType = 1 + Math.floor(Math.random() * NUM_TREE_TYPES - 1);
+	}
+	MUSHROOM_TYPES[particle.mushroomType].initMushroomParticle(particle, null);
+	
+}
+
+function MUSHROOM_PARTICLE_ACTION(particle) {
+	offscreenParticleCtx.beginPath();
+	offscreenParticleCtx.lineWidth = particle.size;
+	offscreenParticleCtx.strokeStyle = particle.rgbaColor;
+	offscreenParticleCtx.lineCap = "round";
+	offscreenParticleCtx.moveTo(particle.x, particle.y);
+	particle.x += particle.xVelocity;
+	particle.y += particle.yVelocity;
+	offscreenParticleCtx.lineTo(particle.x, particle.y);
+	offscreenParticleCtx.stroke();
+	
+	const iterations = particle.actionIterations;
+	if (iterations >= particle.nextBranch) {
+		particle.branches++;
+		if (particle.maxBranches === 0) {
+			particles.makeParticleInactive(particle);
+			return;
+		}
+		const leafBranch = particle.color === MUSHROOM_TOP || particle.branches === particle.maxBranches;
+		const mushroomInfo = MUSHROOM_TYPES[particle.mushroomType];
+		const branchAngles = mushroomInfo.branchAngles(particle);
+		const numBranches = branchAngles.length;
+		for (var i = 0; i < numBranches; i++) {
+			const b = particles.addActiveParticle(MUSHROOM_PARTICLE, particle.x, particle.y, particle.i);
+			if (!b) break;
+			b.generation = particle.generation + 1;
+			b.maxBranches = Math.max(0, particle.maxBranches - 1);
+			b.branchSpacing = particle.branchSpacing * mushroomInfo.branchSpacingFactor(particle);
+			b.nextBranch = b.branchSpacing;
+			b.angle = branchAngles[i];
+			b.setVelocity(particle.velocity, b.angle);
+			b.size = Math.max(particle.size - 1, 2);
+			b.mushroomType = particle.mushroomType;
+			mushroomInfo.initMushroomParticle(b, particle);
+			if (leafBranch) b.setColor(MUSHROOM_TOP);
 		}
 		if (particle.branches >= particle.maxBranches) {
 			particles.makeParticleInactive(particle);
