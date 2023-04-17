@@ -1295,6 +1295,7 @@ function MUSHROOM_DIRT_WET_ACTION(x, y, i) {
 
 function MUSHROOM_STEM_ACTION(x,y,i) {
 	doGrow(x, y, i, CLONE, 5);
+	//a
 	if (random() < 5) {
 		if (borderingAdjacent(x, y, i, FIRE) !== -1) {
 			gameImagedata32[i] = FIRE;
