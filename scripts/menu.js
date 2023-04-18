@@ -18,9 +18,13 @@
  */
 /* Configuration of the menu */
 const ELEMENT_MENU_ELEMENTS_PER_ROW = 7;
+const EarthRow = 3;
+const ExplosivesRow = 2;
+const UnnaturalRow = 1; 
+const OtherRow = 1;
 const PEN_SIZES = [1, 2, 4, 8, 16, 32, 64, 128, 256];
 const PEN_SIZE_LABELS = ["0.5px", "1px", "2px", "4px", "8px", "16px", "32px", "64px", "128px"];
-const DEFAULT_PEN_IDX = 8;
+const DEFAULT_PEN_IDX = 5;
 /* Elements listed in the menu */
 // prettier-ignore
 const elementMenuItems = [
@@ -31,6 +35,15 @@ const elementMenuItems = [
   SPICE, SPOUT, WELL, FACTORY, HUMAN, CLONE, THANOS, MYSTERY, NANITES, VOID, MUSHROOM_DIRT, MUSHROOM_DIRT_WET, MUSHROOM_STEM, MUSHROOM_TOP, BLOOD,
   ZOMBIE, BACKGROUND,
 ];
+
+
+const Earth = [SAND,DEEPSAND,SALT,WATER,SALT_WATER,SNOW,ICE,SOIL,WET_SOIL,PLANT,BRANCH,LEAF,POLLEN,LAVA,ROCK,HUMAN,MUSHROOM_DIRT,MUSHROOM_DIRT_WET,MUSHROOM_STEM,MUSHROOM_TOP];
+const Explosives = [FIRE,TORCH,FIRE_CURSE,OIL,METHANE,FUSE,GUNPOWDER,NAPALM,NITRO,CHARGED_NITRO,C4,REMOTE_C4,THERMITE,BURNING_THERMITE,FIREWORK,SPICE];
+const Unnatural = [CRYO,CHILLED_ICE,ACID,CORRUPT,ZOMBIE,MYSTERY,NANITES,VOID,THANOS,BLOOD];
+const Other = [WALL,CONCRETE,BEDROCK,STEAM,WAX,FALLING_WAX,FACTORY,SPOUT,WELL,CLONE,BACKGROUND];
+
+
+
 const menuNames = {};
 menuNames[WALL] = "WALL";
 menuNames[BEDROCK] = "BEDROCK";
@@ -90,7 +103,6 @@ menuNames[MUSHROOM_TOP] = "Mushroom Top";
 menuNames[BLOOD] = "Blood";
 menuNames[ZOMBIE] = "Zombies";
 
-
 //a
 
 /*
@@ -114,9 +126,115 @@ function initMenu() {
 	/* Set up the wrapper div that holds the element selectors */
 	const elementMenu = document.getElementById("elementTable");
 	elementMenu.style.width = "50%"; /* force browser to scrunch the element menu */
+
+	const elementMenuEx = document.getElementById("elementTableEx");
+	elementMenuEx.style.width = "50%";
+
+	const elementMenuU = document.getElementById("elementTableU");
+	elementMenuU.style.width = "50%";
+
+	const elementMenuO = document.getElementById("elementTableO");
+	elementMenuO.style.width = "50%";
+
 	const numRows = Math.ceil(elementMenuItems.length / ELEMENT_MENU_ELEMENTS_PER_ROW);
+	const numRowsE = Math.ceil(Earth.length / EarthRow);
+	const numRowsEx = Math.ceil(Explosives.length / ExplosivesRow);
+	const numRowsU = Math.ceil(Unnatural.length / UnnaturalRow);
+	const numRowsO = Math.ceil(Other.length / OtherRow);
 	var elemIdx = 0;
+	var next = 0;
 	var i, k;
+	for (i = 0; i < numRowsE; i++) {
+		const row = elementMenu.insertRow(i);
+		for (k = 0; k < EarthRow; k++) {
+			if (elemIdx >= Earth.length) {
+				elemIdx = 0;
+				break;
+				
+			};	
+			const cell = row.insertCell(k);
+			const elemButton = document.createElement("input");
+			cell.appendChild(elemButton);
+			elemButton.type = "button";
+			elemButton.className = "elementMenuButton";
+			const elemType = Earth[elemIdx];
+			if (!(elemType in menuNames)) throw "element is missing a canonical name: " + elemType;
+			elemButton.value = menuNames[elemType];
+			const elemColorRGBA = elemType;
+			elemButton.id = elemColorRGBA;
+			var elemMenuColor;
+			if (elemType in menuAltColors) elemMenuColor = menuAltColors[elemType];
+			else elemMenuColor = "rgb(" + (elemColorRGBA & 0xff) + ", " + ((elemColorRGBA & 0xff00) >>> 8) + ", " + ((elemColorRGBA & 0xff0000) >>> 16) + ")";
+			elemButton.style.color = elemMenuColor;
+			elemButton.addEventListener("click", function() {
+				document.getElementById(SELECTED_ELEM.toString()).classList.remove("selectedElementMenuButton");
+				elemButton.classList.add("selectedElementMenuButton");
+				SELECTED_ELEM = parseInt(elemButton.id, 10);
+			});
+			elemIdx++;
+		}
+	}
+	for (i = 0; i < numRowsE; i++) {
+		const row = elementMenuEx.insertRow(i);
+		
+		for (k = 0; k < ExplosivesRow; k++) {
+			if (elemIdx >= Explosives.length) {
+				elemIdx = 0;
+				break;
+			};	
+			const cell = row.insertCell(k);
+			const elemButton = document.createElement("input");
+			cell.appendChild(elemButton);
+			elemButton.type = "button";
+			elemButton.className = "elementMenuButton";
+			const elemType = Explosives[elemIdx];
+			if (!(elemType in menuNames)) throw "element is missing a canonical name: " + elemType;
+			elemButton.value = menuNames[elemType];
+			const elemColorRGBA = elemType;
+			elemButton.id = elemColorRGBA;
+			var elemMenuColor;
+			if (elemType in menuAltColors) elemMenuColor = menuAltColors[elemType];
+			else elemMenuColor = "rgb(" + (elemColorRGBA & 0xff) + ", " + ((elemColorRGBA & 0xff00) >>> 8) + ", " + ((elemColorRGBA & 0xff0000) >>> 16) + ")";
+			elemButton.style.color = elemMenuColor;
+			elemButton.addEventListener("click", function() {
+				document.getElementById(SELECTED_ELEM.toString()).classList.remove("selectedElementMenuButton");
+				elemButton.classList.add("selectedElementMenuButton");
+				SELECTED_ELEM = parseInt(elemButton.id, 10);
+			});
+			elemIdx++;
+		}
+	}
+	for (i = 0; i < numRowsU; i++) {
+		const row = elementMenuU.insertRow(i);
+		
+		for (k = 0; k < UnnaturalRow; k++) {
+			if (elemIdx >= Unnatural.length) {
+				elemIdx = 0;
+				break;
+			};	
+			const cell = row.insertCell(k);
+			const elemButton = document.createElement("input");
+			cell.appendChild(elemButton);
+			elemButton.type = "button";
+			elemButton.className = "elementMenuButton";
+			const elemType = Unnatural[elemIdx];
+			if (!(elemType in menuNames)) throw "element is missing a canonical name: " + elemType;
+			elemButton.value = menuNames[elemType];
+			const elemColorRGBA = elemType;
+			elemButton.id = elemColorRGBA;
+			var elemMenuColor;
+			if (elemType in menuAltColors) elemMenuColor = menuAltColors[elemType];
+			else elemMenuColor = "rgb(" + (elemColorRGBA & 0xff) + ", " + ((elemColorRGBA & 0xff00) >>> 8) + ", " + ((elemColorRGBA & 0xff0000) >>> 16) + ")";
+			elemButton.style.color = elemMenuColor;
+			elemButton.addEventListener("click", function() {
+				document.getElementById(SELECTED_ELEM.toString()).classList.remove("selectedElementMenuButton");
+				elemButton.classList.add("selectedElementMenuButton");
+				SELECTED_ELEM = parseInt(elemButton.id, 10);
+			});
+			elemIdx++;
+		}
+	}
+	/*
 	for (i = 0; i < numRows; i++) {
 		const row = elementMenu.insertRow(i);
 		for (k = 0; k < ELEMENT_MENU_ELEMENTS_PER_ROW; k++) {
@@ -143,6 +261,7 @@ function initMenu() {
 			elemIdx++;
 		}
 	}
+	*/
 	document.getElementById(SELECTED_ELEM.toString()).click();
 	/* Set up pensize options */
 	const pensizes = document.getElementById("pensize");

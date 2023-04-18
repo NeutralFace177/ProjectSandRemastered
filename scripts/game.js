@@ -40,6 +40,7 @@ gameCanvas.height = height;
 const gameCtx = gameCanvas.getContext("2d");
 const gameImagedata = gameCtx.createImageData(width, height);
 const gameImagedata32 = new Uint32Array(gameImagedata.data.buffer);
+
 /* Storage for game save state. */
 const saveGameImagedata32 = new Uint32Array(gameImagedata32.length);
 var gamestateSaved = false;

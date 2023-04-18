@@ -1454,7 +1454,12 @@ function BURNING_THERMITE_ACTION(x, y, i) {
 }
 
 function BLOOD_ACTION(x,y,i) {
-	
+	if (doGravity(x, y, i, true, 99)) return;
+	if (doDensitySink(x,y,i,HUMAN, true,99)) return;
+	if (doDensitySink(x,y,i, ZOMBIE, true, 99)) return;
+	if(random() < 1) {
+		gameImagedata32[i] = BACKGROUND;
+	}
 }
 
 function HUMAN_ACTION(x, y, i) {
@@ -1468,6 +1473,13 @@ function HUMAN_ACTION(x, y, i) {
         doGravity(x, y, i, true, 1);
         return;
     	}
+		if (borderingAdjacent(x,y,i,ZOMBIE) !== -1) {
+			if (random() < 5) {
+				gameImagedata32[i] = BLOOD;
+			}  else if (random() < 10) {
+				gameImagedata32[i] = ZOMBIE;
+			}
+		}
     	if ((adjacentRight(x, i, BACKGROUND) === -1) && (adjacentRight(x, i, HUMAN) === -1)) {
     		moveUp(y, i, 60);
     		moveRight(x, i, 75);
@@ -1529,6 +1541,7 @@ function ZOMBIE_ACTION(x, y, i) {
     		moveLeft(x, i, 75);
         return;
     	}
+		
       if ((above(y, i, BACKGROUND) !== -1) || (above(y, i, ZOMBIE) !== -1)) {
     		walkAround(x, i, 75);
     		doGravity(x, y, i, false, 95);
