@@ -134,7 +134,7 @@ const MUSHROOM_STEM = __inGameColor(255, 208, 244);
 const MUSHROOM_TOP = __inGameColor(255, 54, 107);
 const MUSHROOM_DIRT = __inGameColor(94, 75, 110);
 const MUSHROOM_DIRT_WET = __inGameColor(54, 35, 70);
-const BLOOD = inGameColor(140, 13, 13);
+const BLOOD = __inGameColor(140, 13, 13);
 /*
  * It would be nice to combine the elements and elementActions
  * into a single 2d array, but to optimize for speed we need
