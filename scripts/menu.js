@@ -234,6 +234,36 @@ function initMenu() {
 			elemIdx++;
 		}
 	}
+	for (i = 0; i < numRowsU; i++) {
+		const row = elementMenuO.insertRow(i);
+		
+		for (k = 0; k < OtherRow; k++) {
+			if (elemIdx >= Other.length) {
+				elemIdx = 0;
+				break;
+			};	
+			const cell = row.insertCell(k);
+			const elemButton = document.createElement("input");
+			cell.appendChild(elemButton);
+			elemButton.type = "button";
+			elemButton.className = "elementMenuButton";
+			const elemType = Other[elemIdx];
+			if (!(elemType in menuNames)) throw "element is missing a canonical name: " + elemType;
+			elemButton.value = menuNames[elemType];
+			const elemColorRGBA = elemType;
+			elemButton.id = elemColorRGBA;
+			var elemMenuColor;
+			if (elemType in menuAltColors) elemMenuColor = menuAltColors[elemType];
+			else elemMenuColor = "rgb(" + (elemColorRGBA & 0xff) + ", " + ((elemColorRGBA & 0xff00) >>> 8) + ", " + ((elemColorRGBA & 0xff0000) >>> 16) + ")";
+			elemButton.style.color = elemMenuColor;
+			elemButton.addEventListener("click", function() {
+				document.getElementById(SELECTED_ELEM.toString()).classList.remove("selectedElementMenuButton");
+				elemButton.classList.add("selectedElementMenuButton");
+				SELECTED_ELEM = parseInt(elemButton.id, 10);
+			});
+			elemIdx++;
+		}
+	}
 	/*
 	for (i = 0; i < numRows; i++) {
 		const row = elementMenu.insertRow(i);
