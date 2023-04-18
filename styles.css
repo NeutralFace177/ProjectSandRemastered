@@ -125,6 +125,7 @@ a:hover {
 }
 
 .elementMenuButton {
+	border-collapse: collapse;
 	background: none;
 	border: none;
 	text-align: left;
