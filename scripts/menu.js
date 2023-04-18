@@ -204,7 +204,7 @@ function initMenu() {
 			elemIdx++;
 		}
 	}
-	for (i = 0; i < numRowsU; i++) {
+	for (i = 0; i < numRowsE; i++) {
 		const row = elementMenuU.insertRow(i);
 		
 		for (k = 0; k < UnnaturalRow; k++) {
@@ -234,7 +234,7 @@ function initMenu() {
 			elemIdx++;
 		}
 	}
-	for (i = 0; i < numRowsO; i++) {
+	for (i = 0; i < numRowsE; i++) {
 		const row = elementMenuO.insertRow(i);
 		
 		for (k = 0; k < OtherRow; k++) {
