@@ -87,7 +87,8 @@ menuNames[MUSHROOM_DIRT] = "Mycelium";
 menuNames[MUSHROOM_DIRT_WET] = "Wet Mycelium";
 menuNames[MUSHROOM_STEM] = "Mushroom Stem";
 menuNames[MUSHROOM_TOP] = "Mushroom Top";
-
+menuNames[BLOOD] = "Blood";
+menuNames[ZOMBIE] = "Zombies";
 
 
 //a
