@@ -149,6 +149,7 @@ function initMenu() {
 	var elemIdx = 0;
 	var next = 0;
 	var i, k;
+	/*
 	for (i = 0; i < numRowsE; i++) {
 		const row = elementMenu.insertRow(i);
 		for (k = 0; k < EarthRow; k++) {
@@ -269,7 +270,8 @@ function initMenu() {
 			elemIdx++;
 		}
 	}
-	/*
+	*/
+	
 	for (i = 0; i < numRows; i++) {
 		const row = elementMenu.insertRow(i);
 		for (k = 0; k < ELEMENT_MENU_ELEMENTS_PER_ROW; k++) {
@@ -296,7 +298,7 @@ function initMenu() {
 			elemIdx++;
 		}
 	}
-	*/
+	
 	document.getElementById(SELECTED_ELEM.toString()).click();
 	/* Set up pensize options */
 	const pensizes = document.getElementById("pensize");
