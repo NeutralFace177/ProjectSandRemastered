@@ -234,7 +234,7 @@ function initMenu() {
 			elemIdx++;
 		}
 	}
-	for (i = 0; i < numRowsU; i++) {
+	for (i = 0; i < numRowsO; i++) {
 		const row = elementMenuO.insertRow(i);
 		
 		for (k = 0; k < OtherRow; k++) {
