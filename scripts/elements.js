@@ -320,7 +320,7 @@ function initElements() {
 	Object.freeze(GAS_PERMEABLE);
 }
 /* ======================= Element action handlers ======================= */
-function BLOOD_FUNCTION(x,y,i) {
+function BLOOD_ACTION(x,y,i) {
 //does nothing rn	
 }
 function WALL_ACTION(x, y, i) {}
