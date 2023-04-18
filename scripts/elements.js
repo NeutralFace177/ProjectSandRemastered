@@ -320,9 +320,6 @@ function initElements() {
 	Object.freeze(GAS_PERMEABLE);
 }
 /* ======================= Element action handlers ======================= */
-function BLOOD_ACTION(x,y,i) {
-//does nothing rn	
-}
 function WALL_ACTION(x, y, i) {}
 
 function BEDROCK_ACTION(x, y, i) {
@@ -1454,6 +1451,10 @@ function BURNING_THERMITE_ACTION(x, y, i) {
 	if (doDensitySink(x, y, i, WATER, false, 95)) return;
 	if (doDensitySink(x, y, i, SALT_WATER, false, 95)) return;
 	if (doDensitySink(x, y, i, OIL, false, 95)) return;
+}
+
+function BLOOD_ACTION(x,y,i) {
+	
 }
 
 function HUMAN_ACTION(x, y, i) {
