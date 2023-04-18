@@ -126,15 +126,19 @@ function initMenu() {
 	/* Set up the wrapper div that holds the element selectors */
 	const elementMenu = document.getElementById("elementTable");
 	elementMenu.style.width = "1%"; /* force browser to scrunch the element menu */
+	elementMenu.style.margin = "5px";
 
 	const elementMenuEx = document.getElementById("elementTableEx");
 	elementMenuEx.style.width = "1%";
+	elementMenuEx.style.margin = "5px";
 
 	const elementMenuU = document.getElementById("elementTableU");
+	elementMenuU.style.margin = "5px";
 	elementMenuU.style.width = "1%";
 
 	const elementMenuO = document.getElementById("elementTableO");
 	elementMenuO.style.width = "1%";
+	elementMenuO.style.margin = "5px";
 
 	const numRows = Math.ceil(elementMenuItems.length / ELEMENT_MENU_ELEMENTS_PER_ROW);
 	
