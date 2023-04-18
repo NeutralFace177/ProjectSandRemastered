@@ -100,27 +100,32 @@ a:hover {
 #elementTable {
 	border-collapse: collapse;
 	float: left;
+	margin-top: 30px;
 }
 
 #elementTableE {
 	border-collapse: collapse;
 	float: left;
+	margin-top: 30px;
 }
 
 #elementTableEx {
 	border-collapse: collapse;
 	float: left;
+	margin-top: 30px;
 }
 
 #elementTableU {
 	
 	border-collapse: collapse;
 	float: left;
+	margin-top: 30px;
 }
 
 #elementTableO {
 	border-collapse: collapse;
 	float: left;
+	margin-top: 30px;
 	
 }
 
