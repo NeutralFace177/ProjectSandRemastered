@@ -102,6 +102,28 @@ a:hover {
 	float: left;
 }
 
+#elementTableE {
+	border-collapse: collapse;
+	float: left;
+}
+
+#elementTableEx {
+	border-collapse: collapse;
+	float: left;
+}
+
+#elementTableU {
+	
+	border-collapse: collapse;
+	float: left;
+}
+
+#elementTableO {
+	border-collapse: collapse;
+	float: left;
+	
+}
+
 .elementMenuButton {
 	background: none;
 	border: none;
