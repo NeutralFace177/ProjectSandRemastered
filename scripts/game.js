@@ -182,6 +182,7 @@ function saveGameCanvas() {
 	const iterEnd = MAX_IDX + 1;
 	for (var i = 0; i !== iterEnd; i++) saveGameImagedata32[i] = gameImagedata32[i];
 	gamestateSaved = true;
+	console.log(saveGameImagedata32);
 }
 /*
  * Save state for the undo function.
