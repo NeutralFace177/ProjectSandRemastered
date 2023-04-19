@@ -76,10 +76,15 @@ function init() {
 	/* Initialize imagedata */
 	const len = gameImagedata32.length;
 	for (var i = 0; i < len; i++) {
-		gameImagedata32[i] = BACKGROUND;
-		saveGameImagedata32[i] = BACKGROUND;
-		undoGameImagedata32[i] = BACKGROUND;
-		aUndoGameImagedata32[i] = BACKGROUND;
+		var y = Math.ceil(i/950);
+		var x = Math.ceil(((i/950)-Math.floor((i/950))) * 500);
+		var s = -10; //size (negative cuz y=0 is the top)
+		
+		if (0 < Math.sin((x/s)*s-y)) {
+			gameImagedata32[i] = WALL;  
+		} else {
+			gameImagedata32[i] = BACKGROUND;	
+		}
 	}
 	/* Nice crisp pixels, regardless of pixel ratio */
 	onscreenCtx.mozImageSmoothingEnabled = false;
