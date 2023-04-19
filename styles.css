@@ -94,7 +94,7 @@ a:hover {
 	position: relative;
 	color: yellow;
 	width: inherit;
-	height: auto;
+	height: min-content;
 }
 
 #elementTable {
