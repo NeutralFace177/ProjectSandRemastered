@@ -18,7 +18,7 @@
  */
 /* ================================ Globals ================================ */
 /* Scaling due to device pixel ratio */
-const onscreenPixelRatio = window.devicePixelRatio;
+const onscreenPixelRatio = window.devicePixelRatio * 10;
 const onscreenScaledWidth = onscreenPixelRatio * width;
 const onscreenScaledHeight = onscreenPixelRatio * height;
 /* Onscreen canvas. Scaled based on pixel ratio. */
