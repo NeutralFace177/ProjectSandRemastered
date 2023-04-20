@@ -61,6 +61,7 @@ var lastLoop = 0;
 var frameDebt = 0;
 var lastFPSLabelUpdate = 0;
 const refreshTimes = [];
+const compressedSave = new Uint32Array();
 /* ========================================================================= */
 function init() {
 	var gameWrapper = document.getElementById("gameWrapper");
@@ -186,6 +187,39 @@ function saveGameCanvas() {
 	 */
 	const iterEnd = MAX_IDX + 1;
 	for (var i = 0; i !== iterEnd; i++) saveGameImagedata32[i] = gameImagedata32[i];
+	gamestateSaved = true;
+	console.log(saveGameImagedata32);
+}
+
+function saveAndCompressCanvas() {
+		
+	const iterEnd = MAX_IDX + 1;
+	var r = 1;
+	var prev;
+	//position in compressed array to put shiz
+	var apos = 0;
+	for (var i = 0; i !== iterEnd; i++) {
+		
+		if (i == MAX_IDX) {
+			compressedSave[apos] = new Array[gameImagedata32[i],1];
+			console.log(compressedSave);
+			break;
+		}
+		
+		if (i > 0) {
+			if (gameImagedata32[i] == prev) {
+			    r++;
+			} else {
+				compressedSave[apos] = new Array[prev,r];
+				r=1;
+				apos++;
+			}
+		}
+		
+		
+		
+		prev = gameImagedata32[i];
+	}
 	gamestateSaved = true;
 	console.log(saveGameImagedata32);
 }
