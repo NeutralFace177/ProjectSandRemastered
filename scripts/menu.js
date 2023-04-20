@@ -443,6 +443,9 @@ function initMenu() {
 	/* save button */
 	const saveButton = document.getElementById("saveButton");
 	saveButton.onclick = saveGameCanvas;
+	
+	const saveFileButton = document.getElementById("saveFileButton");
+	saveFileButton.onclick = saveAndCompressCanvas;
 	/* load button */
 	const loadButton = document.getElementById("loadButton");
 	loadButton.onclick = loadGameCanvas;
