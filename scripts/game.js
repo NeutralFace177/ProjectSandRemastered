@@ -61,7 +61,7 @@ var lastLoop = 0;
 var frameDebt = 0;
 var lastFPSLabelUpdate = 0;
 const refreshTimes = [];
-var compressedSave = new Uint32Array();
+var compressedSave = new Array();
 /* ========================================================================= */
 function init() {
 	var gameWrapper = document.getElementById("gameWrapper");
