@@ -446,6 +446,8 @@ function initMenu() {
 	
 	const saveFileButton = document.getElementById("saveFileButton");
 	saveFileButton.onclick = saveAndCompressCanvas;
+	const loadFileButton = document.getElementById("loadFileButton");
+	loadFileButton.onclick = loadCompressedSave;
 	/* load button */
 	const loadButton = document.getElementById("loadButton");
 	loadButton.onclick = loadGameCanvas;
