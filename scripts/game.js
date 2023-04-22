@@ -61,7 +61,7 @@ var lastLoop = 0;
 var frameDebt = 0;
 var lastFPSLabelUpdate = 0;
 const refreshTimes = [];
-var compressedSave = new Uint32Array(475000);
+var compressedSave = new Array();
 var c2 = new Array();
 /* ========================================================================= */
 function init() {
@@ -197,7 +197,8 @@ function saveAndCompressCanvas() {
 	const iterEnd = MAX_IDX + 1;
 	var r = 1;
 	var prev;
-	compressedSave = new Uint32Array();
+	compressedSave = new Array(0);
+	c2 = new Array(0);
 	//position in compressed array to put shiz
 	var apos = 0;
 	for (var i = 0; i !== iterEnd; i++) {
@@ -213,7 +214,7 @@ function saveAndCompressCanvas() {
 			if (gameImagedata32[i] == prev) {
 			    r++;
 			} else {
-				compressedSave.push(prev);
+				compressedSave.push(gameImagedata32[i]);
 				c2.push(r);
 				r=1;
 				apos++;
@@ -226,6 +227,7 @@ function saveAndCompressCanvas() {
 	}
 	gamestateSaved = true;
 	//console.log(saveGameImagedata32);
+	console.log(c2);
 }
 /*
  * Save state for the undo function.
