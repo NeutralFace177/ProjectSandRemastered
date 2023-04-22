@@ -229,6 +229,21 @@ function saveAndCompressCanvas() {
 	//console.log(saveGameImagedata32);
 	console.log(c2);
 }
+
+function loadCompressedSave() {
+	
+	const iterEnd = MAX_IDX+1;
+	var p = 0;
+	var i = 0;
+	var c = 0;
+	for (p = 0; p !== c2.length + 1; p++) {
+		for (c = 0; c !== c2[p]; c++) {
+			gameImagedata32[i] = compressedSave[p];	
+		}
+	}
+	
+}
+
 /*
  * Save state for the undo function.
  */
