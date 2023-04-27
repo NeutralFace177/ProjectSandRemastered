@@ -236,17 +236,7 @@ function loadCompressedSave() {
 	var p = 0;
 	var i = 0;
 	var c = 0;
-	for (p = 0; p !== c2.length + 1; p++) {
-		for (c = 0; c++) {
-			i++;
-			gameImagedata32[i] = compressedSave[p];	
-			if (c >= c2[p]) {
-				break;
-		}
-		if (i == iterEnd) {
-			break;
-		}
-	}
+	
 	
 }
 
