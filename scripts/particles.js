@@ -568,12 +568,12 @@ class MushroomType {
 class Mushroom0 extends MushroomType {
 	/** @nocollapse */
 	static branchAngles(mushroomParticle) {
-		const branchAngle = EIGHTH_PI + Math.random() * QUARTER_PI;
+		const branchAngle = HALF_PI + Math.random() * QUARTER_PI;
 		return [mushroomParticle.angle + branchAngle, mushroomParticle.angle - branchAngle];
 	}
 	/** @nocollapse */
 	static branchSpacingFactor(mushroomParticle) {
-		return 0.9;
+		return 1.57;
 	}
 }
 /* Single branch */
@@ -585,8 +585,8 @@ class Mushroom1 extends MushroomType {
 	}
 	/** @nocollapse */
 	static branchAngles(mushroomParticle) {
-		const branchAngle = (EIGHTH_PI + Math.random() * EIGHTH_PI) * mushroomParticle.branchDirection;
-		return [mushroomParticle.angle + branchAngle, mushroomParticle.angle];
+		const branchAngle = (QUARTER_PI + Math.random() * HALF_PI) * mushroomParticle.branchDirection;
+		return [mushroomParticle.angle + branchAngle * 0.85, mushroomParticle.angle];
 	}
 	/** @nocollapse */
 	static branchSpacingFactor(mushroomParticle) {
