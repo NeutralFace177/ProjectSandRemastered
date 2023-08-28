@@ -680,7 +680,7 @@ function MUSHROOM_PARTICLE_ACTION(particle) {
 			particles.makeParticleInactive(particle);
 			return;
 		}
-		if (particle.branchSpacing > 45) particle.branchSpacing *= 0.8;
+		if (particle.branchSpacing > 65) particle.branchSpacing *= 0.8;
 		particle.nextBranch = iterations + particle.branchSpacing * (Math.random() * 0.35 + 0.65);
 	}
 }
