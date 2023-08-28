@@ -1289,7 +1289,7 @@ function MUSHROOM_DIRT_WET_ACTION(x, y, i) {
 		/* make tree generation less likely */
 		
 		if (true) {
-			if (particles.addActiveParticle(TREE_PARTICLE, x, y, i)) {
+			if (particles.addActiveParticle(MUSHROOM_PARTICLE, x, y, i)) {
 				gameImagedata32[i] = MUSHROOM_DIRT;
 			}
 		}
