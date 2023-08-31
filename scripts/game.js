@@ -85,7 +85,7 @@ function init() {
 		if (0 > Math.sin((x/s))*-s-y+(height/2)) {
 			gameImagedata32[i] = SAND;  
 		} else if (0 > Math.sin((x/s))*-s-y+(height/2) + 50) {
-			gameImagedata32[i] = WALL;
+			gameImagedata32[i] = SAND;
 		} else {
 			gameImagedata32[i] = BACKGROUND;	
 		}
