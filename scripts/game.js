@@ -83,9 +83,9 @@ function init() {
 		var s = 10; //size (negative cuz y=0 is the top)
 		
 		if (0 > Math.sin((x/s))*-s-y+(height/2)) {
-			gameImagedata32[i] = WALL;  
-		} else if (0 > Math.sin((x/s))*-s-y+(height/2) + 50) {
-			gameImagedata32[i] = SAND;
+			gameImagedata32[i] = SAND;  
+		} else if (100 > Math.sin((x/s))*-s-y+(height/2)) {
+			gameImagedata32[i] = BEDROCK;
 		} else {
 			gameImagedata32[i] = BACKGROUND;	
 		}
