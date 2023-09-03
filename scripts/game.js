@@ -91,6 +91,9 @@ function init() {
 		} else {
 			gameImagedata32[i] = BACKGROUND;	
 		}
+		if (490000 > Math.pow(x,2) + (20 * Math.pow(y+500)) {
+			gameImagedata32[i] = LAVA;
+		}
 	}
 	/* Nice crisp pixels, regardless of pixel ratio */
 	onscreenCtx.mozImageSmoothingEnabled = false;
